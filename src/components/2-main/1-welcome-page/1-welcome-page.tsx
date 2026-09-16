@@ -7,7 +7,7 @@ import { Button } from "@/ui/shadcn/button";
 import { Checkbox } from "@/ui/shadcn/checkbox";
 import { Label } from "@/ui/shadcn/label";
 import { Section3_Footer } from "@/components/3-footer";
-import { AppLogo, APP_NAME } from "../0-app-logo";
+import { AppLogo, APP_NAME } from "./0-app-logo";
 
 export function WelcomePage() {
     const navigate = useNavigateToPage();
