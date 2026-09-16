@@ -1,7 +1,8 @@
 import path from 'node:path';
 import tailwindcss from '@tailwindcss/vite';
-import { defineConfig } from 'vite';
+import { defineConfig, type PluginOption } from 'vite';
 import react from '@vitejs/plugin-react';
+import visualizer from 'rollup-plugin-visualizer';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -9,7 +10,7 @@ export default defineConfig({
     server: {
         port: 3000,
     },
-    plugins: [react(), tailwindcss()],
+    plugins: [react(), tailwindcss(), bundleVisualizer()],
     resolve: {
         alias: {
             '@': path.resolve(import.meta.dirname, './src'),
@@ -89,3 +90,16 @@ function npmPackageName(id: string): string | undefined {
 }
 
 const NODE_MODULES = '/node_modules/';
+
+//---------------------------------------------------------------------------
+// Bundle Visualizer
+
+function bundleVisualizer(): PluginOption {
+    return visualizer({
+        filename: 'visualization.html',
+        //template: 'sunburst', 
+        template: 'flamegraph', // flamegraph - as flamegraph; sunburst - as d3 style (good as default as well); treemap - as table (default); network - as graph (slow to open).
+        gzipSize: true,
+        brotliSize: true,
+    });
+}
