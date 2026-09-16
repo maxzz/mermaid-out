@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { CopyIcon, DownloadIcon } from "lucide-react";
 import { mermaidSettings, type OutputFormat } from "@/store/3-mermaid-settings";
 import { renderDiagram } from "@/store/5-render";
-import { loadBeautifulMermaid } from "@/utils/lazy-modules";
+import { loadBeautifulMermaid } from "@/components/2-main/2-editor-page/2-editor/8-lazy-modules";
 import { copyText } from "@/utils/export-utils";
 import { isOpenExportDialogAtom } from "@/components/4-dialogs/2-export/9-types-export";
 import { Button } from "@/ui/shadcn/button";

@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { CopyIcon, DownloadIcon } from "lucide-react";
 import { type ExportFormat, mermaidSettings, type PngScale } from "@/store/3-mermaid-settings";
 import { renderDiagram, type RenderResult } from "@/store/5-render";
-import { loadBeautifulMermaid } from "@/utils/lazy-modules";
+import { loadBeautifulMermaid } from "@/components/2-main/2-editor-page/2-editor/8-lazy-modules";
 import { copyPngBlob, copyText, downloadBlob, downloadText, getSvgNaturalSize, svgToPngBlob } from "@/utils/export-utils";
 import { Button } from "@/ui/shadcn/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/ui/shadcn/dialog";

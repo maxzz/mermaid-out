@@ -29,7 +29,7 @@ export default function MonacoMermaidEditor() {
 }
 
 const editorOptions: EditorProps['options'] = {
-    fontSize: 13,
+    fontSize: 11,
     fontFamily: "'Geist Mono Variable', monospace",
     fontLigatures: true,
     lineNumbersMinChars: 3,

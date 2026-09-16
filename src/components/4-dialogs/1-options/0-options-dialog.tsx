@@ -2,7 +2,7 @@ import { type ReactNode, Suspense, use, useId } from "react";
 import { useAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { DIAGRAM_FONTS, type DiagramTheme, mermaidSettings } from "@/store/3-mermaid-settings";
-import { loadBeautifulMermaid } from "@/utils/lazy-modules";
+import { loadBeautifulMermaid } from "@/components/2-main/2-editor-page/2-editor/8-lazy-modules";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/ui/shadcn/dialog";
 import { Label } from "@/ui/shadcn/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/shadcn/select";

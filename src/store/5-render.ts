@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { proxy } from 'valtio';
 import type { AsciiRenderOptions, DiagramColors, RenderOptions } from 'beautiful-mermaid'; // `import type` only: keep the lazy chunk lazy
-import type { BeautifulMermaidModule } from '@/utils/lazy-modules';
+import type { BeautifulMermaidModule } from '@/components/2-main/2-editor-page/2-editor/8-lazy-modules';
 import { resolveCssVar } from '@/utils/export-utils';
 import { type DiagramTheme, type MermaidSettings, type OutputFormat } from './3-mermaid-settings';
 

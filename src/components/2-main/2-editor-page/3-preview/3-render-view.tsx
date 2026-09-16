@@ -4,7 +4,7 @@ import { useSnapshot } from "valtio";
 import { classNames } from "@/utils";
 import { mermaidSettings, setZoom, ZOOM_STEP } from "@/store/3-mermaid-settings";
 import { publishPreviewStatus, renderDiagram, useDebouncedValue } from "@/store/5-render";
-import { loadBeautifulMermaid } from "@/utils/lazy-modules";
+import { loadBeautifulMermaid } from "@/components/2-main/2-editor-page/2-editor/8-lazy-modules";
 import { panModeAtom, PREVIEW_CONTENT_ATTR } from "./4-zoom-controls";
 
 const RENDER_DEBOUNCE_MS = 300;
