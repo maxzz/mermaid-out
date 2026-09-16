@@ -171,7 +171,7 @@ function SliderRow({ label, value, min, max, step, onChange }: SliderRowProps) {
         <div className="flex flex-col gap-1.5">
             <div className="flex items-center justify-between">
                 <Label>{label}</Label>
-                <span className="font-mono text-[.7rem] text-muted-foreground tabular-nums">{value}</span>
+                <span className="font-mono tabular-nums text-[.7rem] text-muted-foreground">{value}</span>
             </div>
             <Slider value={[value]} min={min} max={max} step={step} onValueChange={([v]) => onChange(v)} />
         </div>

@@ -115,7 +115,7 @@ function ExportPreview({ format, result, pngUrl, pngSize }: { format: ExportForm
         <div className="h-72 bg-muted/30 border border-border rounded-md overflow-auto flex">
             {result.error
                 ? (
-                    <pre className="whitespace-pre-wrap m-auto px-4 py-3 max-w-full text-xs font-code text-destructive">
+                    <pre className="m-auto px-4 py-3 max-w-full text-xs font-code text-destructive whitespace-pre-wrap">
                         {result.error}
                     </pre>
                 )

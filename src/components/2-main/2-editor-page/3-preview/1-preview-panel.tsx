@@ -13,7 +13,7 @@ export function PreviewPanel() {
         <div className="h-full bg-muted/20 flex flex-col">
             <PreviewToolbar />
 
-            <div className="relative min-h-0 flex-1">
+            <div className="flex-1 relative min-h-0">
                 <ErrorBoundary fallback={<PanelMessage>Failed to load the diagram renderer.</PanelMessage>}>
                     <Suspense fallback={<PanelMessage><BarsLoader /></PanelMessage>}>
                         <RenderView scrollRef={scrollRef} />

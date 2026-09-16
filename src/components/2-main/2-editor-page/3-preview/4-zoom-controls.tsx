@@ -49,7 +49,7 @@ export function ZoomControls({ scrollRef, className, ...rest }: ZoomControlsProp
             </Button>
 
             <button
-                className="min-w-10 font-mono text-[.7rem] text-muted-foreground hover:text-foreground cursor-pointer tabular-nums"
+                className="min-w-10 font-mono tabular-nums text-[.7rem] text-muted-foreground hover:text-foreground cursor-pointer"
                 onClick={() => setZoom(1)}
                 title="Reset zoom to 100%"
                 type="button"

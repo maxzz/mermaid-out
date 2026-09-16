@@ -51,7 +51,7 @@ export function RenderView({ scrollRef }: RenderViewProps) {
             <div className="p-6 min-w-full min-h-full flex">
                 {result.error
                     ? (
-                        <pre className="whitespace-pre-wrap m-auto px-4 py-3 max-w-full text-xs font-code text-destructive bg-destructive/10 border border-destructive/30 rounded-md">
+                        <pre className="m-auto px-4 py-3 max-w-full text-xs font-code text-destructive bg-destructive/10 border border-destructive/30 rounded-md whitespace-pre-wrap">
                             {result.error}
                         </pre>
                     )

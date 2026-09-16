@@ -14,7 +14,7 @@ export function EditorPanel() {
         <div className="h-full flex flex-col">
             <EditorToolbar />
 
-            <div className="min-h-0 flex-1">
+            <div className="flex-1 min-h-0">
                 <ErrorBoundary fallback={<PanelMessage>Failed to load the editor.</PanelMessage>}>
                     <Suspense fallback={<PanelMessage><BarsLoader /></PanelMessage>}>
                         <MonacoMermaidEditor />
