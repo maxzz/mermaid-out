@@ -85,7 +85,7 @@ export function ScrollBar({ className, orientation = "vertical", ...rest }: Comp
         <Prim.ScrollAreaScrollbar
             orientation={orientation}
             className={cn(
-                "select-none transition-colors flex touch-none",
+                "data-[state=hidden]:hidden select-none transition-colors flex touch-none",
                 orientation === "vertical" && "w-2.5 h-full border-l border-l-transparent p-px",
                 orientation === "horizontal" && "h-2.5 border-t border-t-transparent p-px",
                 className

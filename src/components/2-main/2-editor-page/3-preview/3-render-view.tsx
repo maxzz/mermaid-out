@@ -43,8 +43,7 @@ export function RenderView({ scrollRef }: RenderViewProps) {
 
     return (
         <div
-            ref={scrollRef}
-            className={classNames("h-full overflow-auto", panMode && "cursor-grab select-none")}
+            className={classNames("min-w-full min-h-full", panMode && "cursor-grab select-none")}
             onWheel={onWheel}
             {...panHandlers}
         >
