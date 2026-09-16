@@ -1,6 +1,7 @@
 import { Suspense, useRef } from "react";
 import { BarsLoader } from "@/ui/local-ui";
 import { ErrorBoundary } from "@/ui/local-ui/8-error-boundary";
+import { ScrollArea } from "@/ui/shadcn/scroll-area";
 import { PreviewToolbar } from "./2-preview-toolbar";
 import { RenderView } from "./3-render-view";
 import { ZoomControls } from "./4-zoom-controls";
@@ -13,14 +14,18 @@ export function PreviewPanel() {
         <div className="h-full bg-muted/20 flex flex-col">
             <PreviewToolbar />
 
-            <div className="flex-1 relative min-h-0">
-                <ErrorBoundary fallback={<PanelMessage>Failed to load the diagram renderer.</PanelMessage>}>
-                    <Suspense fallback={<PanelMessage><BarsLoader /></PanelMessage>}>
-                        <RenderView scrollRef={scrollRef} />
-                    </Suspense>
-                </ErrorBoundary>
+            <div className="relative flex-1 min-h-0">
+                <div className="absolute inset-0 overflow-hidden">
+                    <ScrollArea className="h-full" fullHeight fixedWidth viewportClassName="overflow-hidden!">
+                        <ErrorBoundary fallback={<PanelMessage>Failed to load the diagram renderer.</PanelMessage>}>
+                            <Suspense fallback={<PanelMessage><BarsLoader /></PanelMessage>}>
+                                <RenderView scrollRef={scrollRef} />
+                            </Suspense>
+                        </ErrorBoundary>
+                    </ScrollArea>
 
-                <ZoomControls scrollRef={scrollRef} className="absolute right-4 bottom-4" />
+                    <ZoomControls scrollRef={scrollRef} className="absolute left-4 bottom-4" />
+                </div>
             </div>
 
             <StatusBar />
