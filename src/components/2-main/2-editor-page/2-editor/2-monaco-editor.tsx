@@ -44,5 +44,8 @@ const editorOptions: EditorProps['options'] = {
     smoothScrolling: true,
     cursorBlinking: 'smooth',
     bracketPairColorization: { enabled: true },
-    scrollbar: { verticalScrollbarSize: 8, horizontalScrollbarSize: 8 },
+    overviewRulerLanes: 0,
+    overviewRulerBorder: false,
+    hideCursorInOverviewRuler: true,
+    scrollbar: { verticalScrollbarSize: 8, horizontalScrollbarSize: 8, vertical: 'auto', horizontal: 'auto' },
 };

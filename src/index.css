@@ -167,3 +167,11 @@
         @apply font-sans;
     }
 }
+
+/* Monaco fades scrollbars with class "invisible"; Tailwind's .invisible is visibility:hidden. */
+.monaco-editor .scrollbar.invisible,
+.monaco-editor .scrollbar.invisible .slider {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none;
+}
