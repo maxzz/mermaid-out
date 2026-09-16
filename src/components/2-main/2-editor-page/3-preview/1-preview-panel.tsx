@@ -80,8 +80,7 @@ function useViewportOverflow(ref: RefObject<HTMLElement | null>, deps: unknown[]
             }
             return () => ro.disconnect();
         },
-        deps,
-    );
+        deps);
 
     return overflow;
 }

@@ -32,7 +32,6 @@ export function PreviewToolbar() {
             <div className="flex items-center gap-1">
                 <Button variant="ghost" size="xs" onClick={() => copyCurrentOutput()} title={`Copy ${outputFormat === 'svg' ? 'SVG markup' : 'text'} to clipboard`}>
                     <CopyIcon />
-                    Copy
                 </Button>
 
                 <Button variant="outline" size="xs" onClick={() => setOpenExport(true)} title="Export as SVG, text or PNG">
