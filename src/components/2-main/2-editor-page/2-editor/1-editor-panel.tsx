@@ -4,6 +4,7 @@ import { loadMonacoEditor } from "@/components/2-main/2-editor-page/2-editor/8-l
 import { MERMAID_SAMPLES } from "@/utils/mermaid-samples";
 import { BarsLoader } from "@/ui/local-ui";
 import { ErrorBoundary } from "@/ui/local-ui/8-error-boundary";
+import { ScrollArea } from "@/ui/shadcn/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/shadcn/select";
 
 // Monaco lives in its own chunk; the promise is shared with preloadEditorPageModules()
@@ -14,12 +15,16 @@ export function EditorPanel() {
         <div className="h-full flex flex-col">
             <EditorToolbar />
 
-            <div className="flex-1 min-h-0">
-                <ErrorBoundary fallback={<PanelMessage>Failed to load the editor.</PanelMessage>}>
-                    <Suspense fallback={<PanelMessage><BarsLoader /></PanelMessage>}>
-                        <MonacoMermaidEditor />
-                    </Suspense>
-                </ErrorBoundary>
+            <div className="relative flex-1 min-h-0">
+                <div className="absolute inset-0 overflow-hidden">
+                    <ScrollArea className="h-full" fullHeight fixedWidth viewportClassName="overflow-hidden!">
+                        <ErrorBoundary fallback={<PanelMessage>Failed to load the editor.</PanelMessage>}>
+                            <Suspense fallback={<PanelMessage><BarsLoader /></PanelMessage>}>
+                                <MonacoMermaidEditor />
+                            </Suspense>
+                        </ErrorBoundary>
+                    </ScrollArea>
+                </div>
             </div>
         </div>
     );
