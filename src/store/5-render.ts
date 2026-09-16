@@ -3,7 +3,7 @@ import { proxy } from 'valtio';
 import type { AsciiRenderOptions, DiagramColors, RenderOptions } from 'beautiful-mermaid'; // `import type` only: keep the lazy chunk lazy
 import type { BeautifulMermaidModule } from '@/components/2-main/2-editor-page/2-editor/8-lazy-modules';
 import { resolveCssVar } from '@/utils/export-utils';
-import { type DiagramTheme, type MermaidSettings, type OutputFormat } from './3-mermaid-settings';
+import { type DiagramTheme, type MermaidSettings, type OutputFormat } from './2-mermaid-settings';
 
 export type RenderResult = {
     format: OutputFormat;
@@ -103,10 +103,12 @@ export function publishPreviewStatus(result: RenderResult) {
 export function useDebouncedValue<T>(value: T, delayMs: number): T {
     const [debounced, setDebounced] = useState(value);
 
-    useEffect(() => {
-        const id = setTimeout(() => setDebounced(value), delayMs);
-        return () => clearTimeout(id);
-    }, [value, delayMs]);
+    useEffect(
+        () => {
+            const id = setTimeout(() => setDebounced(value), delayMs);
+            return () => clearTimeout(id);
+        },
+        [value, delayMs]);
 
     return debounced;
 }

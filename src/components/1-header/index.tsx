@@ -1,7 +1,7 @@
 import { useSetAtom } from "jotai";
 import { SlidersHorizontalIcon } from "lucide-react";
 import { useNavigateToPage } from "@/store/4-ui-atoms";
-import { isOpenOptionsDialogAtom } from "@/components/4-dialogs/1-options/9-types-options";
+import { isOpenOptionsDialogAtom } from "@/components/4-dialogs/1-options/a-types-options";
 import { Button } from "@/ui/shadcn/button";
 import { AppLogo, APP_NAME } from "@/components/2-main/0-app-logo";
 import { ButtonThemeToggle } from "./8-btn-theme-toggle";

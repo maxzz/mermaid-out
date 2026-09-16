@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { mermaidSettings } from "@/store/3-mermaid-settings";
+import { mermaidSettings } from "@/store/2-mermaid-settings";
 import { loadMonacoEditor } from "@/components/2-main/2-editor-page/2-editor/8-lazy-modules";
 import { MERMAID_SAMPLES } from "@/utils/mermaid-samples";
 import { BarsLoader } from "@/ui/local-ui";

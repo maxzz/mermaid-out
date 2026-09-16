@@ -1,6 +1,6 @@
 import { startTransition, addTransitionType, useCallback } from 'react';
 import { atom, useSetAtom } from 'jotai';
-import { mermaidSettings } from './3-mermaid-settings';
+import { mermaidSettings } from './2-mermaid-settings';
 
 /**
  * Transient UI state lives in Jotai (not Valtio) on purpose:
@@ -22,11 +22,12 @@ export function useNavigateToPage() {
 
     return useCallback(
         (page: AppPage) => {
-            startTransition(() => {
-                addTransitionType(page === 'main' ? TRANSITION_TYPE_TO_MAIN : TRANSITION_TYPE_TO_WELCOME);
-                setPage(page);
-            });
+            startTransition(
+                () => {
+                    addTransitionType(page === 'main' ? TRANSITION_TYPE_TO_MAIN : TRANSITION_TYPE_TO_WELCOME);
+                    setPage(page);
+                }
+            );
         },
-        [setPage],
-    );
+        [setPage]);
 }

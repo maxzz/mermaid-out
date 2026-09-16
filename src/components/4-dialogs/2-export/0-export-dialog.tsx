@@ -3,7 +3,7 @@ import { useAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { toast } from "sonner";
 import { CopyIcon, DownloadIcon } from "lucide-react";
-import { type ExportFormat, mermaidSettings, type PngScale } from "@/store/3-mermaid-settings";
+import { type ExportFormat, mermaidSettings, type PngScale } from "@/store/2-mermaid-settings";
 import { renderDiagram, type RenderResult } from "@/store/5-render";
 import { loadBeautifulMermaid } from "@/components/2-main/2-editor-page/2-editor/8-lazy-modules";
 import { copyPngBlob, copyText, downloadBlob, downloadText, getSvgNaturalSize, svgToPngBlob } from "@/utils/export-utils";
@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Tabs, TabsList, TabsTrigger } from "@/ui/shadcn/tabs";
 import { BarsLoader } from "@/ui/local-ui";
 import { ErrorBoundary } from "@/ui/local-ui/8-error-boundary";
-import { EXPORT_FILENAME, EXPORT_FORMATS, isOpenExportDialogAtom } from "./9-types-export";
+import { EXPORT_FILENAME, EXPORT_FORMATS, isOpenExportDialogAtom } from "./a-types-export";
 
 export function ExportDialog() {
     const [isOpen, setIsOpen] = useAtom(isOpenExportDialogAtom);

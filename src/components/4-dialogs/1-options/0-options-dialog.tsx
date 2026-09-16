@@ -1,15 +1,16 @@
 import { type ReactNode, Suspense, use, useId } from "react";
 import { useAtom } from "jotai";
 import { useSnapshot } from "valtio";
-import { DIAGRAM_FONTS, type DiagramTheme, mermaidSettings } from "@/store/3-mermaid-settings";
-import { loadBeautifulMermaid } from "@/components/2-main/2-editor-page/2-editor/8-lazy-modules";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/ui/shadcn/dialog";
 import { Label } from "@/ui/shadcn/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/shadcn/select";
 import { Slider } from "@/ui/shadcn/slider";
 import { Switch } from "@/ui/shadcn/switch";
+
 import { BarsLoader } from "@/ui/local-ui";
-import { isOpenOptionsDialogAtom } from "./9-types-options";
+import { DIAGRAM_FONTS, type DiagramTheme, mermaidSettings } from "@/store/2-mermaid-settings";
+import { loadBeautifulMermaid } from "@/components/2-main/2-editor-page/2-editor/8-lazy-modules";
+import { isOpenOptionsDialogAtom } from "./a-types-options";
 
 export function OptionsDialog() {
     const [isOpen, setIsOpen] = useAtom(isOpenOptionsDialogAtom);

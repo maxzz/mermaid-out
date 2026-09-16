@@ -3,7 +3,7 @@ import type { ThemeName } from 'beautiful-mermaid'; // `import type` only: must 
 import { debounceDevTools } from '@/utils/debounce';
 import { DEFAULT_MERMAID_SOURCE } from '@/utils/mermaid-samples';
 
-const STORE_KEY = "mermaid-out";
+const STORE_KEY = "tm-mermaid-out-settings";
 const STORE_VER = "v1.0";
 const STORAGE_ID = `${STORE_KEY}__${STORE_VER}`;
 

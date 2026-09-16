@@ -1,6 +1,6 @@
 import { useEffect, useId } from "react";
 import { useSnapshot } from "valtio";
-import { mermaidSettings } from "@/store/3-mermaid-settings";
+import { mermaidSettings } from "@/store/2-mermaid-settings";
 import { useNavigateToPage } from "@/store/4-ui-atoms";
 import { preloadEditorPageModules } from "@/components/2-main/2-editor-page/2-editor/8-lazy-modules";
 import { Button } from "@/ui/shadcn/button";

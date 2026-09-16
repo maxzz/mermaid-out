@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import { type ExportFormat } from "@/store/3-mermaid-settings";
+import { type ExportFormat } from "@/store/2-mermaid-settings";
 
 export const isOpenExportDialogAtom = atom(false);
 

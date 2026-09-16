@@ -1,7 +1,7 @@
 import { useSnapshot } from "valtio";
 import Editor, { type EditorProps } from "@monaco-editor/react";
 import { appSettings } from "@/store/1-ui-settings";
-import { mermaidSettings } from "@/store/3-mermaid-settings";
+import { mermaidSettings } from "@/store/2-mermaid-settings";
 import { isThemeDark } from "@/utils/theme-utils";
 import { BarsLoader } from "@/ui/local-ui";
 import { MONACO_LANGUAGE_MERMAID, MONACO_THEME_DARK, MONACO_THEME_LIGHT } from "./3-monaco-setup";
