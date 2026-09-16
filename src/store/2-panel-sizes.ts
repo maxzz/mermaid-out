@@ -6,7 +6,7 @@ export interface PanelSizes {
 }
 
 export function getValidPanelSizes(parsedSizes?: unknown): PanelSizes {
-    const defaultHorizontal = { left: 30, right: 70 };
+    const defaultHorizontal = { left: 40, right: 60 }; // editor | preview
     const defaultVertical = { top: 50, bottom: 50 };
 
     const sizes = parsedSizes as PanelSizes | undefined;

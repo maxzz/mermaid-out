@@ -19,10 +19,26 @@ export default defineConfig({
         rolldownOptions: {
             output: {
                 codeSplitting: {
+                    // Only the matched modules go into a group chunk. With the default (true), a group also
+                    // captures its dependencies (e.g. `react` via @monaco-editor/react), which would force the
+                    // main bundle to statically import the lazy monaco chunk.
+                    includeDependenciesRecursively: false,
                     groups: [
+                        // Lazy chunks: loaded only when the editor page mounts (see src/utils/lazy-modules.ts)
+                        {
+                            name: 'monaco',
+                            test: /[\\/]node_modules[\\/](monaco-editor|monaco-mermaid|@monaco-editor[\\/][^\\/]+|state-local)[\\/]/,
+                            priority: 30,
+                        },
+                        {
+                            name: 'beautiful-mermaid', // includes the ~1.6 MB ELK layout engine
+                            test: /[\\/]node_modules[\\/](beautiful-mermaid|elkjs|entities)[\\/]/,
+                            priority: 30,
+                        },
                         {
                             name: vendorChunkName,
                             test: /[\\/]node_modules[\\/]/,
+                            priority: 10,
                         },
                     ],
                 },

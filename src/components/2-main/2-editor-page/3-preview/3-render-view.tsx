@@ -1,0 +1,124 @@
+import { type CSSProperties, type PointerEvent, type RefObject, type WheelEvent, use, useEffect, useMemo, useRef } from "react";
+import { useAtomValue } from "jotai";
+import { useSnapshot } from "valtio";
+import { classNames } from "@/utils";
+import { mermaidSettings, setZoom, ZOOM_STEP } from "@/store/3-mermaid-settings";
+import { publishPreviewStatus, renderDiagram, useDebouncedValue } from "@/store/5-render";
+import { loadBeautifulMermaid } from "@/utils/lazy-modules";
+import { panModeAtom, PREVIEW_CONTENT_ATTR } from "./4-zoom-controls";
+
+const RENDER_DEBOUNCE_MS = 300;
+
+type RenderViewProps = {
+    scrollRef: RefObject<HTMLDivElement | null>;
+};
+
+/** Suspends until beautiful-mermaid is loaded (see PreviewPanel Suspense boundary). */
+export function RenderView({ scrollRef }: RenderViewProps) {
+    const bm = use(loadBeautifulMermaid());
+
+    const { source, outputFormat, zoom, diagramTheme, ascii, svg } = useSnapshot(mermaidSettings);
+    const debouncedSource = useDebouncedValue(source, RENDER_DEBOUNCE_MS);
+
+    // Synchronous, memoized render: no flash, only recomputed when inputs change
+    const result = useMemo(
+        () => renderDiagram(bm, debouncedSource, { diagramTheme, ascii, svg }, outputFormat),
+        [bm, debouncedSource, diagramTheme, ascii, svg, outputFormat],
+    );
+
+    useEffect(() => publishPreviewStatus(result), [result]);
+
+    const panMode = useAtomValue(panModeAtom);
+    const panHandlers = usePanToScroll(scrollRef, panMode);
+
+    function onWheel(e: WheelEvent<HTMLDivElement>) {
+        if (!e.ctrlKey && !e.metaKey) {
+            return;
+        }
+        e.preventDefault();
+        setZoom(e.deltaY < 0 ? zoom * ZOOM_STEP : zoom / ZOOM_STEP);
+    }
+
+    const contentStyle: CSSProperties = { zoom };
+
+    return (
+        <div
+            ref={scrollRef}
+            className={classNames("h-full overflow-auto", panMode && "cursor-grab select-none")}
+            onWheel={onWheel}
+            {...panHandlers}
+        >
+            <div className="p-6 min-w-full min-h-full flex">
+                {result.error
+                    ? (
+                        <pre className="whitespace-pre-wrap m-auto px-4 py-3 max-w-full text-xs font-code text-destructive bg-destructive/10 border border-destructive/30 rounded-md">
+                            {result.error}
+                        </pre>
+                    )
+                    : !result.output
+                        ? (
+                            <div className="m-auto text-sm text-muted-foreground">
+                                Start typing to render your diagram
+                            </div>
+                        )
+                        : result.format === 'svg'
+                            ? (
+                                <div
+                                    {...{ [PREVIEW_CONTENT_ATTR]: '' }}
+                                    className="m-auto [&>svg]:max-w-none [&>svg]:block"
+                                    style={contentStyle}
+                                    dangerouslySetInnerHTML={{ __html: result.output }}
+                                />
+                            )
+                            : (
+                                <pre
+                                    {...{ [PREVIEW_CONTENT_ATTR]: '' }}
+                                    className="m-auto text-xs font-code text-foreground leading-[1.15]"
+                                    style={contentStyle}
+                                >
+                                    {result.output}
+                                </pre>
+                            )
+                }
+            </div>
+        </div>
+    );
+}
+
+/** Drag-to-scroll when pan mode is on (or with the middle mouse button). */
+function usePanToScroll(scrollRef: RefObject<HTMLDivElement | null>, panMode: boolean) {
+    const dragRef = useRef<{ x: number; y: number; left: number; top: number; } | null>(null);
+
+    function onPointerDown(e: PointerEvent<HTMLDivElement>) {
+        const el = scrollRef.current;
+        const middleButton = e.button === 1;
+        if (!el || (!panMode && !middleButton) || (e.button !== 0 && !middleButton)) {
+            return;
+        }
+        e.preventDefault();
+        el.setPointerCapture(e.pointerId);
+        dragRef.current = { x: e.clientX, y: e.clientY, left: el.scrollLeft, top: el.scrollTop };
+        el.style.cursor = 'grabbing';
+    }
+
+    function onPointerMove(e: PointerEvent<HTMLDivElement>) {
+        const el = scrollRef.current;
+        const drag = dragRef.current;
+        if (!el || !drag) {
+            return;
+        }
+        el.scrollLeft = drag.left - (e.clientX - drag.x);
+        el.scrollTop = drag.top - (e.clientY - drag.y);
+    }
+
+    function onPointerUp(e: PointerEvent<HTMLDivElement>) {
+        const el = scrollRef.current;
+        if (el && dragRef.current) {
+            el.releasePointerCapture(e.pointerId);
+            el.style.cursor = '';
+        }
+        dragRef.current = null;
+    }
+
+    return { onPointerDown, onPointerMove, onPointerUp, onPointerCancel: onPointerUp };
+}
