@@ -6,6 +6,7 @@ import { BarsLoader } from "@/ui/local-ui";
 import { ErrorBoundary } from "@/ui/local-ui/8-error-boundary";
 import { ScrollArea } from "@/ui/shadcn/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/shadcn/select";
+import { SvgLayoutEnginePopover } from "@/components/2-main/2-editor-page/3-preview/8-svg-layout-popover";
 
 // Monaco lives in its own chunk; the promise is shared with preloadEditorPageModules()
 const MonacoMermaidEditor = lazy(loadMonacoEditor);
@@ -37,20 +38,24 @@ function EditorToolbar() {
                 Editor
             </span>
 
-            <Select value="" onValueChange={(name) => loadSample(name)}>
-                <SelectTrigger size="sm" className="h-6! text-[.7rem]" title="Replace the source with a sample diagram">
-                    <SelectValue placeholder="Samples" />
-                </SelectTrigger>
-                <SelectContent position="popper" align="end">
-                    {MERMAID_SAMPLES.map(
-                        (sample) => (
-                            <SelectItem key={sample.name} value={sample.name}>
-                                {sample.name}
-                            </SelectItem>
-                        )
-                    )}
-                </SelectContent>
-            </Select>
+            <div className="flex items-center gap-1">
+                <SvgLayoutEnginePopover />
+
+                <Select value="" onValueChange={(name) => loadSample(name)}>
+                    <SelectTrigger size="sm" className="h-6! text-[.7rem]" title="Replace the source with a sample diagram">
+                        <SelectValue placeholder="Samples" />
+                    </SelectTrigger>
+                    <SelectContent position="popper" align="end">
+                        {MERMAID_SAMPLES.map(
+                            (sample) => (
+                                <SelectItem key={sample.name} value={sample.name}>
+                                    {sample.name}
+                                </SelectItem>
+                            )
+                        )}
+                    </SelectContent>
+                </Select>
+            </div>
         </div>
     );
 }
