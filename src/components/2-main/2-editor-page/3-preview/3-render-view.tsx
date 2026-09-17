@@ -5,6 +5,7 @@ import { classNames } from "@/utils";
 import { mermaidSettings, setZoom, ZOOM_STEP } from "@/store/2-mermaid-settings";
 import { publishPreviewStatus, renderDiagram, useDebouncedValue } from "@/store/5-render";
 import { loadBeautifulMermaid } from "@/components/2-main/2-editor-page/2-editor/8-lazy-modules";
+import { usePreviewSourceLink } from "@/components/2-main/2-editor-page/4-source-link/preview";
 import { panModeAtom, PREVIEW_CONTENT_ATTR } from "./4-zoom-controls";
 
 const RENDER_DEBOUNCE_MS = 300;
@@ -30,6 +31,18 @@ export function RenderView({ scrollRef }: RenderViewProps) {
 
     const panMode = useAtomValue(panModeAtom);
     const panHandlers = usePanToScroll(scrollRef, panMode);
+    const hostRef = useRef<HTMLDivElement>(null);
+    const contentRef = useRef<HTMLDivElement>(null);
+    const svgEnabled = result.format === "svg" && !!result.output && !result.error;
+
+    usePreviewSourceLink({
+        contentRef,
+        hostRef,
+        scrollRef,
+        enabled: svgEnabled,
+        output: svgEnabled ? result.output : "",
+        panMode,
+    });
 
     function onWheel(e: WheelEvent<HTMLDivElement>) {
         if (!e.ctrlKey && !e.metaKey) {
@@ -43,6 +56,7 @@ export function RenderView({ scrollRef }: RenderViewProps) {
 
     return (
         <div
+            ref={hostRef}
             className={classNames("min-w-full min-h-full", panMode && "cursor-grab select-none")}
             onWheel={onWheel}
             {...panHandlers}
@@ -63,6 +77,7 @@ export function RenderView({ scrollRef }: RenderViewProps) {
                         : result.format === 'svg'
                             ? (
                                 <div
+                                    ref={contentRef}
                                     {...{ [PREVIEW_CONTENT_ATTR]: '' }}
                                     className="m-auto [&>svg]:max-w-none [&>svg]:block"
                                     style={contentStyle}
