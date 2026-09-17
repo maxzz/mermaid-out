@@ -37,8 +37,8 @@ export function RenderOptionsPopover() {
                 </PopoverHeader>
 
                 <TooltipProvider delayDuration={0}>
-                    <div className="flex flex-col gap-4">
-                        <Suspense fallback={<div className="py-6 flex justify-center"><BarsLoader /></div>}>
+                    <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] gap-x-3 gap-y-4 items-center">
+                        <Suspense fallback={<div className="col-span-full py-6 flex justify-center"><BarsLoader /></div>}>
                             <DiagramThemeSection />
                         </Suspense>
                         <SvgLayoutSection />
@@ -175,8 +175,8 @@ function TextOutputSection() {
 
 function Section({ title, children }: { title: string; children: ReactNode; }) {
     return (
-        <section className="flex flex-col gap-3">
-            <h3 className="text-[.7rem] font-semibold text-muted-foreground uppercase tracking-wider">
+        <section className="col-span-full grid grid-cols-subgrid gap-y-2">
+            <h3 className="col-span-full text-[.7rem] font-semibold text-muted-foreground uppercase tracking-wider">
                 {title}
             </h3>
             {children}
@@ -184,12 +184,14 @@ function Section({ title, children }: { title: string; children: ReactNode; }) {
     );
 }
 
+const optionRowClasses = "col-span-full grid grid-cols-subgrid items-center min-h-7";
+
 function Row({ label, hint, children }: { label: string; hint: string; children: ReactNode; }) {
     const id = useId();
     return (
-        <div className="flex items-center justify-between gap-3">
+        <div className={optionRowClasses}>
             <HintLabel htmlFor={id} hint={hint}>{label}</HintLabel>
-            <div id={id} className="shrink-0">
+            <div id={id} className="col-span-2 justify-self-end">
                 {children}
             </div>
         </div>
@@ -208,12 +210,10 @@ type SliderRowProps = {
 
 function SliderRow({ label, hint, value, min, max, step, onChange }: SliderRowProps) {
     return (
-        <div className="flex flex-col gap-1.5">
-            <div className="flex items-center justify-between">
-                <HintLabel hint={hint}>{label}</HintLabel>
-                <span className="text-[.7rem] font-mono tabular-nums text-muted-foreground">{value}</span>
-            </div>
-            <Slider value={[value]} min={min} max={max} step={step} onValueChange={([v]) => onChange(v)} />
+        <div className={optionRowClasses}>
+            <HintLabel hint={hint}>{label}</HintLabel>
+            <Slider className="min-w-0" value={[value]} min={min} max={max} step={step} onValueChange={([v]) => onChange(v)} />
+            <span className="min-w-9 text-right text-[.7rem] font-mono tabular-nums text-muted-foreground">{value}</span>
         </div>
     );
 }
@@ -222,7 +222,7 @@ function HintLabel({ htmlFor, hint, children }: { htmlFor?: string; hint: string
     return (
         <Tooltip>
             <TooltipTrigger asChild>
-                <Label htmlFor={htmlFor} className="cursor-help underline decoration-dotted decoration-muted-foreground/60 underline-offset-2">
+                <Label htmlFor={htmlFor} className="cursor-help whitespace-nowrap underline decoration-dotted decoration-muted-foreground/60 underline-offset-2">
                     {children}
                 </Label>
             </TooltipTrigger>
