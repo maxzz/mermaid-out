@@ -4,6 +4,7 @@ import { appSettings } from "@/store/1-ui-settings";
 import { mermaidSettings } from "@/store/2-mermaid-settings";
 import { isThemeDark } from "@/utils/theme-utils";
 import { BarsLoader } from "@/ui/local-ui";
+import { useMonacoSourceLink } from "@/components/2-main/2-editor-page/4-source-link/monaco";
 import { MONACO_LANGUAGE_MERMAID, MONACO_THEME_DARK, MONACO_THEME_LIGHT } from "./3-monaco-setup";
 
 /**
@@ -14,6 +15,7 @@ export default function MonacoMermaidEditor() {
     const { source } = useSnapshot(mermaidSettings);
     const { theme } = useSnapshot(appSettings);
     const isDark = isThemeDark(theme);
+    const onMount = useMonacoSourceLink();
 
     return (
         <Editor
@@ -22,6 +24,7 @@ export default function MonacoMermaidEditor() {
             theme={isDark ? MONACO_THEME_DARK : MONACO_THEME_LIGHT}
             value={source}
             onChange={(value) => { mermaidSettings.source = value ?? ''; }}
+            onMount={onMount}
             options={editorOptions}
             loading={<BarsLoader />}
         />
