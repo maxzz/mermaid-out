@@ -1,194 +1,214 @@
 /**
- * Post-process beautiful-mermaid text output.
+ * beautiful-mermaid's flowchart ASCII path uses `getCorners()` for every
+ * rectangle, including `[[subroutine]]` nodes. In Unicode mode those corners
+ * are `╟`/`╢` (double-vertical tees). Mixed with single `│`/`─` they look
+ * broken at the corners; doubling the sides (`││`) makes verticals even
+ * thicker. Rewrite to a matching single-line box (`┌┐└┘` / ASCII `+`).
  *
- * Flowchart ASCII draws every shape as a rectangle with a 4-corner lookup.
- * Subroutine (`[[text]]`) corners are ╟/╢ (Unicode) or `|` (pure ASCII), so the
- * inner bars exist only in the corner glyphs and look overlapped or broken.
- *
- * Rewrite those boxes to a real double border:
- *
- *   ╟───────────╢      ┌┬─────────┬┐         |-----------|      ++---------+
- *   │           │  →   ││         ││    and  |           |  →   ||         ||
- *   ╟───────────╢      └┴─────────┴┘         |-----------|      ++---------+
+ * Also: a vertical through a horizontal is often left as `|`/`│` instead of
+ * a crossing, so a later row's box top looks like a gap in the bar.
  */
 
-type BoxAlphabet = {
-    topLeft: string;
-    topRight: string;
-    h: string;
-    v: string;
-    outTopLeft: string;
-    outTopJoin: string;
-    outTopRight: string;
-    outBottomLeft: string;
-    outBottomJoin: string;
-    outBottomRight: string;
-};
-
-const UNICODE: BoxAlphabet = {
-    topLeft: '╟',
-    topRight: '╢',
-    h: '─',
-    v: '│',
-    outTopLeft: '┌',
-    outTopJoin: '┬',
-    outTopRight: '┐',
-    outBottomLeft: '└',
-    outBottomJoin: '┴',
-    outBottomRight: '┘',
-};
-
-const ASCII: BoxAlphabet = {
-    topLeft: '|',
-    topRight: '|',
-    h: '-',
-    v: '|',
-    outTopLeft: '+',
-    outTopJoin: '+',
-    outTopRight: '+',
-    outBottomLeft: '+',
-    outBottomJoin: '+',
-    outBottomRight: '+',
-};
+const BOX_TOP = new Set(["┌", "╭", "╔", "╒", "╓", "+", "|", "╟"]);
 
 export function fixMermaidAsciiBoxes(text: string): string {
-    let rows = text.split('\n').map((line) => Array.from(line));
-    const unicode = rewrite(rows, UNICODE);
-    const ascii = rewrite(rows, ASCII);
-    const crossings = fixThroughCrossings(rows);
-    return unicode || ascii || crossings ? rows.map((row) => row.join('')).join('\n') : text;
+    const rows = text.split("\n").map((line) => [...line]);
+    if (rows.length === 0) {
+        return text;
+    }
+
+    const boxes = findBoxes(rows);
+    for (const box of boxes) {
+        applyBoxCorners(rows, box);
+    }
+    patchCrossings(rows);
+    return rows.map((row) => row.join("")).join("\n");
 }
 
-function rewrite(rows: string[][], a: BoxAlphabet): boolean {
-    let changed = false;
-    for (let y1 = 0; y1 < rows.length; y1++) {
-        const row = rows[y1]!;
-        for (let x1 = 0; x1 < row.length; x1++) {
-            if (row[x1] !== a.topLeft) {
+type Box = {
+    x1: number;
+    x2: number;
+    y1: number;
+    y2: number;
+    unicode: boolean;
+};
+
+function findBoxes(rows: string[][]): Box[] {
+    const boxes: Box[] = [];
+    const seen = new Set<string>();
+
+    for (let y = 0; y < rows.length; y++) {
+        const row = rows[y];
+        for (let x = 0; x < row.length; x++) {
+            const ch = row[x];
+            const unicode = ch === "╟";
+            if (ch !== "|" && !unicode) {
                 continue;
             }
-            const x2 = findTopRight(row, x1, a);
+            if (x + 1 >= row.length) {
+                continue;
+            }
+            const next = row[x + 1];
+            if (next !== "-" && next !== "─") {
+                continue;
+            }
+
+            let x2 = -1;
+            for (let i = x + 2; i < row.length; i++) {
+                const end = row[i];
+                if ((unicode && end === "╢") || (!unicode && end === "|")) {
+                    x2 = i;
+                    break;
+                }
+                if (end !== "-" && end !== "─") {
+                    break;
+                }
+            }
             if (x2 < 0) {
                 continue;
             }
-            const y2 = findBottom(rows, x1, x2, y1, a);
-            if (y2 < 0) {
+
+            const bottom = findMatchingBottom(rows, x, x2, y + 1, unicode);
+            if (bottom < 0) {
                 continue;
             }
-            applyDoubleBorder(rows, x1, y1, x2, y2, a);
-            changed = true;
-            x1 = x2;
+
+            const key = `${x},${y},${x2},${bottom}`;
+            if (seen.has(key)) {
+                continue;
+            }
+            seen.add(key);
+            boxes.push({ x1: x, x2, y1: y, y2: bottom, unicode });
         }
     }
-    return changed;
+
+    return boxes;
 }
 
-function findTopRight(row: string[], x1: number, a: BoxAlphabet): number {
-    if (x1 + 3 >= row.length) {
-        return -1;
-    }
-    let x = x1 + 1;
-    while (x < row.length && row[x] === a.h) {
-        x++;
-    }
-    if (x >= row.length || row[x] !== a.topRight || x - x1 < 3) {
-        return -1;
-    }
-    return x;
-}
-
-function findBottom(rows: string[][], x1: number, x2: number, y1: number, a: BoxAlphabet): number {
-    for (let y = y1 + 2; y < rows.length; y++) {
-        const row = rows[y]!;
-        if (row[x1] !== a.topLeft || row[x2] !== a.topRight) {
+function findMatchingBottom(rows: string[][], x1: number, x2: number, startY: number, unicode: boolean): number {
+    for (let y = startY; y < rows.length; y++) {
+        const row = rows[y];
+        if (row.length <= x2) {
             continue;
         }
-        let ok = true;
-        for (let x = x1 + 1; x < x2; x++) {
-            if (row[x] !== a.h) {
-                ok = false;
-                break;
-            }
-        }
-        if (!ok) {
+        const left = row[x1];
+        const right = row[x2];
+        const isBottom = unicode
+            ? (left === "╟" || left === "└" || left === "╰") && (right === "╢" || right === "┘" || right === "╯")
+            : left === "|" && right === "|";
+        if (!isBottom) {
             continue;
         }
-        for (let mid = y1 + 1; mid < y; mid++) {
-            const chL = rows[mid]![x1];
-            const chR = rows[mid]![x2];
-            if (chL !== a.v && chL !== a.topLeft) {
-                ok = false;
-                break;
-            }
-            if (chR !== a.v && chR !== a.topRight) {
-                ok = false;
-                break;
-            }
+        const between = row.slice(x1 + 1, x2);
+        if (between.length === 0) {
+            continue;
         }
-        if (ok) {
+        const bar = unicode ? "─" : "-";
+        if (between.every((ch) => ch === bar)) {
             return y;
         }
     }
     return -1;
 }
 
-function applyDoubleBorder(rows: string[][], x1: number, y1: number, x2: number, y2: number, a: BoxAlphabet) {
-    const top = rows[y1]!;
-    top[x1] = a.outTopLeft;
-    top[x1 + 1] = a.outTopJoin;
-    top[x2 - 1] = a.outTopJoin;
-    top[x2] = a.outTopRight;
+function applyBoxCorners(rows: string[][], box: Box): void {
+    const { x1, x2, y1, y2, unicode } = box;
+    const top = unicode ? (["┌", "┐"] as const) : (["+", "+"] as const);
+    const bottom = unicode ? (["└", "┘"] as const) : (["+", "+"] as const);
+    const side = unicode ? "│" : "|";
 
-    const bottom = rows[y2]!;
-    bottom[x1] = a.outBottomLeft;
-    bottom[x1 + 1] = a.outBottomJoin;
-    bottom[x2 - 1] = a.outBottomJoin;
-    bottom[x2] = a.outBottomRight;
+    rows[y1][x1] = top[0];
+    rows[y1][x2] = top[1];
+    rows[y2][x1] = bottom[0];
+    rows[y2][x2] = bottom[1];
 
     for (let y = y1 + 1; y < y2; y++) {
-        const row = rows[y]!;
-        if (isBarCell(row[x1], a)) {
-            row[x1] = a.v;
+        const row = rows[y];
+        if (row.length <= x2) {
+            continue;
         }
-        if (isBarCell(row[x2], a)) {
-            row[x2] = a.v;
+        if (row[x1] === " " || row[x1] === "|" || row[x1] === "│") {
+            row[x1] = side;
         }
-        if (isBarCell(row[x1 + 1], a)) {
-            row[x1 + 1] = a.v;
-        }
-        if (isBarCell(row[x2 - 1], a)) {
-            row[x2 - 1] = a.v;
+        if (row[x2] === " " || row[x2] === "|" || row[x2] === "│") {
+            row[x2] = side;
         }
     }
 }
 
-function isBarCell(ch: string | undefined, a: BoxAlphabet): boolean {
-    return ch === ' ' || ch === a.v || ch === a.topLeft || ch === a.topRight;
-}
-
-/** `|`/`│` sitting on a horizontal border is a through-crossing; use a T/cross join. */
-function fixThroughCrossings(rows: string[][]): boolean {
-    let changed = false;
-    for (const row of rows) {
+function patchCrossings(rows: string[][]): void {
+    for (let y = 1; y < rows.length - 1; y++) {
+        const row = rows[y];
+        const above = rows[y - 1];
+        const below = rows[y + 1];
         for (let x = 1; x < row.length - 1; x++) {
-            const left = row[x - 1]!;
-            const right = row[x + 1]!;
-            if (row[x] === '|' && isAsciiH(left) && isAsciiH(right)) {
-                row[x] = '+';
-                changed = true;
-            } else if (row[x] === '│' && isUnicodeH(left) && isUnicodeH(right)) {
-                row[x] = '┼';
-                changed = true;
+            const ch = row[x];
+            if (ch !== "|" && ch !== "│") {
+                continue;
+            }
+            const left = row[x - 1];
+            const right = row[x + 1];
+            const up = above[x];
+            const down = below[x];
+            const h = (left === "-" || left === "─") && (right === "-" || right === "─");
+            const v = BOX_TOP.has(up ?? "") || up === "|" || up === "│" || up === "┼" || up === "+"
+                || BOX_TOP.has(down ?? "") || down === "|" || down === "│" || down === "┼" || down === "+";
+            if (h && v) {
+                row[x] = ch === "│" ? "┼" : "+";
             }
         }
     }
-    return changed;
 }
 
-function isAsciiH(ch: string): boolean {
-    return ch === '-' || ch === '+' || ch === '=';
-}
+/*
+import { renderMermaidASCII } from "beautiful-mermaid";
+import { fixMermaidAsciiBoxes } from "./fix-mermaid-ascii.ts";
+const src = `graph TD
+    subgraph ctx [1-context-script]
+        A[0-client-entry.ts]
+        B[bridge.ts]
+    end
+    subgraph dt [DevTools - not a page worker]
+        C[panel - 0-editor-ui]
+    end
+    subgraph sw [2-service-worker - not a page]
+        D[[index.ts]]
+    end
+    A --> C
+    B -->|executeScript| D
+    C <-->|port| sw
+`;
+const raw = renderMermaidASCII(src, { useAscii: false, colorMode: "none" });
+const fixed = fixMermaidAsciiBoxes(raw);
+process.stdout.write("--- RAW ---\n");
+process.stdout.write(raw + "\n");
+process.stdout.write("--- FIXED ---\n");
+process.stdout.write(fixed + "\n");
+process.stdout.write(`has corner ${raw.includes("╟")} after ${fixed.includes("╟")}\n`);
 
-function isUnicodeH(ch: string): boolean {
-    return ch === '─' || ch === '━' || ch === '┬' || ch === '┴' || ch === '┼' || ch === '├' || ch === '┤' || ch === '┌' || ch === '┐' || ch === '└' || ch === '┘';
-}
+┌─────────────────────────────────────────────────────────────────────┐                          ┌─────────────────────────┐
+│                          1-context-script                           │                          │DevTools — not a page wor│
+│                                                                     │                          │                         │
+│                                                                     │                          │                         │
+│ ┌───────────────────────┐             ┌───────────────────────────┐ │                          │ ┌─────────────────────┐ │
+│ │                       │             │                           │ │                          │ │                     │ │
+│ │   0-client-entry.ts   │             │         bridge.ts         │ │             ┌────────────┼─┤ panel · 0-editor-ui │ │
+│ │                       │             │                           │ │             │            │ │                     │ │
+│ └───────────┬───────────┘             └─────────────┬─────────────┘ │             │            │ └──────────▲──────────┘ │
+│             ┆                                       ┆               │             │            │            │            │
+└─────────────┆───────────────────────────────────────┆───────────────┘             │            └────────────┼────────────┘
+              ┆                                       ┆                             │                port devtools-page     
+              ┆                                       ┆                             │                         │             
+              ┌─────────────────────────────────────────────────────────────────────┘                         │             
+┌───inspectedWindow.eval──────────────────────────────┆───────────────┐                          ┌────────────┼────────────┐
+│             │      Inspected tab — two JS worlds    ┆               │                          │2-service-worker — not a │
+│             │                                       ┆               │                          │            │            │
+│             ▼                                       ▼               │                          │            ▼            │
+│ ┌───────────────────────┐             ┌───────────────────────────┐ │                          │ ┌─────────────────────┐ │
+│ │                       │             │                           │ │                          │ │                     │ │
+│ │ MAIN · page-client.js ◄─postMessage►│ ISOLATED · page-bridge.js ◄executeScport─clientISOLATED┼►┤       index.ts      │ │
+│ │                       │             │                           │ │                          │ │                     │ │
+│ └───────────────────────┘             └───────────────────────────┘ │                          │ └─────────────────────┘ │
+│                                                                     │                          │                         │
+└─────────────────────────────────────────────────────────────────────┘                          └─────────────────────────┘
+*/
