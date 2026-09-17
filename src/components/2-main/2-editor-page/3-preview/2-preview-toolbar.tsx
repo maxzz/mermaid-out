@@ -9,6 +9,7 @@ import { copyText } from "@/utils/export-utils";
 import { isOpenExportDialogAtom } from "@/components/4-dialogs/2-export/a-types-export";
 import { Button } from "@/ui/shadcn/button";
 import { Tabs, TabsList, TabsTrigger } from "@/ui/shadcn/tabs";
+import { RenderOptionsPopover } from "./6-render-options-popover";
 
 export function PreviewToolbar() {
     const { outputFormat } = useSnapshot(mermaidSettings);
@@ -33,6 +34,8 @@ export function PreviewToolbar() {
                 <Button variant="ghost" size="xs" onClick={() => copyCurrentOutput()} title={`Copy ${outputFormat === 'svg' ? 'SVG markup' : 'text'} to clipboard`}>
                     <CopyIcon />
                 </Button>
+
+                <RenderOptionsPopover />
 
                 <Button variant="outline" size="xs" onClick={() => setOpenExport(true)} title="Export as SVG, text or PNG">
                     <DownloadIcon />
