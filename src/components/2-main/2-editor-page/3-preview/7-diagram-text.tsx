@@ -8,16 +8,18 @@ type DiagramTextProps = {
 } & Omit<HTMLAttributes<HTMLPreElement>, "children">;
 
 /**
- * Courier New keeps latin and box-drawing in one face; Roboto Mono is the
- * fallback. One block per row pins every line to the same em grid so `│`
- * ink does not overlap.
+ * Monaco paints every column at `n * cellWidth`. HTML `<pre>` uses each
+ * glyph's advance, so a narrower `┆` (Courier New) or a wider `│` (Geist
+ * Mono symbols) walks the rest of the line off the grid. Cascadia Mono
+ * keeps letters, box-drawing, and arrows on one em; one block per row
+ * pins `│` to the same line box so the stems meet instead of overlapping.
  */
 export function DiagramText({ text, className, style, ...rest }: DiagramTextProps) {
     const lines = text.split("\n");
     return (
         <pre
             {...rest}
-            className={classNames("text-xs font-diagram text-foreground [font-variant-ligatures:none] [font-kerning:none]", className)}
+            className={classNames("m-0 text-xs leading-none font-diagram font-features-['liga'_0,'calt'_0] text-foreground [font-kerning:none] [font-variant-ligatures:none]", className)}
             style={style}
         >
             {lines.map((line, i) => (
@@ -28,3 +30,31 @@ export function DiagramText({ text, className, style, ...rest }: DiagramTextProp
         </pre>
     );
 }
+
+/*
+┌─────────────────────────────────────────────────────────────────────┐                          ┌─────────────────────────┐
+│                          1-context-script                           │                          │DevTools — not a page wor│
+│                                                                     │                          │                         │
+│                                                                     │                          │                         │
+│ ┌───────────────────────┐             ┌───────────────────────────┐ │                          │ ┌─────────────────────┐ │
+│ │                       │             │                           │ │                          │ │                     │ │
+│ │   0-client-entry.ts   │             │         bridge.ts         │ │             ┌────────────┼─┤ panel · 0-editor-ui │ │
+│ │                       │             │                           │ │             │            │ │                     │ │
+│ └───────────┬───────────┘             └─────────────┬─────────────┘ │             │            │ └──────────▲──────────┘ │
+│             ┆                                       ┆               │             │            │            │            │
+└─────────────┆───────────────────────────────────────┆───────────────┘             │            └────────────┼────────────┘
+              ┆                                       ┆                             │                port devtools-page     
+              ┆                                       ┆                             │                         │             
+              ┌─────────────────────────────────────────────────────────────────────┘                         │             
+┌───inspectedWindow.eval──────────────────────────────┆───────────────┐                          ┌────────────┼────────────┐
+│             │      Inspected tab — two JS worlds    ┆               │                          │2-service-worker — not a │
+│             │                                       ┆               │                          │            │            │
+│             ▼                                       ▼               │                          │            ▼            │
+│ ┌───────────────────────┐             ┌───────────────────────────┐ │                          │ ┌─────────────────────┐ │
+│ │                       │             │                           │ │                          │ │                     │ │
+│ │ MAIN · page-client.js ◄─postMessage►│ ISOLATED · page-bridge.js ◄executeScport─clientISOLATED┼►┤       index.ts      │ │
+│ │                       │             │                           │ │                          │ │                     │ │
+│ └───────────────────────┘             └───────────────────────────┘ │                          │ └─────────────────────┘ │
+│                                                                     │                          │                         │
+└─────────────────────────────────────────────────────────────────────┘                          └─────────────────────────┘
+*/

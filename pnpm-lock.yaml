@@ -17,10 +17,10 @@ importers:
       '@fontsource-variable/roboto-condensed':
         specifier: ^5.3.0
         version: 5.3.0
-      '@fontsource-variable/roboto-mono':
+      '@fontsource-variable/yanone-kaffeesatz':
         specifier: ^5.3.0
         version: 5.3.0
-      '@fontsource-variable/yanone-kaffeesatz':
+      '@fontsource/cascadia-mono':
         specifier: ^5.3.0
         version: 5.3.0
       '@monaco-editor/react':
@@ -467,11 +467,11 @@ packages:
   '@fontsource-variable/roboto-condensed@5.3.0':
     resolution: {integrity: sha512-RpYyF6G0h0nsVcCDLRIbZbK+l8cVDoe1PVbzvzVhtLzCiPqIEEGDs9xB9ZWPJawKS4bJzpKn42KgZFISF/AOuQ==}
 
-  '@fontsource-variable/roboto-mono@5.3.0':
-    resolution: {integrity: sha512-h5r+KY/6qy8JEOj33JgcrFO81YAnvrc1EAwMpl/EPJLb2OIvOy0/jmB5M7qs7x/uXk5JUP5Ux4LrkeOK7faHkQ==}
-
   '@fontsource-variable/yanone-kaffeesatz@5.3.0':
     resolution: {integrity: sha512-G9b+BdwnXRF9GXmMIv/0flUTse2Ftd6N82AbQAZ74oCGEUCsrVsmEEnCq9nXuQFkeQMCma2yod13yvA4v4IHEQ==}
+
+  '@fontsource/cascadia-mono@5.3.0':
+    resolution: {integrity: sha512-50GR+UT8w92Gzg5QWHQWe7arIfogm6VrpEqUx9K/YK/MgbwS2GaBx/Dfd+sE8uAQu6btnbDFq9ezrOC41fgo0g==}
 
   '@hono/node-server@2.1.1':
     resolution: {integrity: sha512-ELuehkj5VCBdgEw9zs+ivkKwyzzUCSQuE96YmiPvn1ECBoZCczbFXJLeEGMTYjphP6gydh4pHMqEYPVMYUVgQg==}
@@ -4111,9 +4111,9 @@ snapshots:
 
   '@fontsource-variable/roboto-condensed@5.3.0': {}
 
-  '@fontsource-variable/roboto-mono@5.3.0': {}
-
   '@fontsource-variable/yanone-kaffeesatz@5.3.0': {}
+
+  '@fontsource/cascadia-mono@5.3.0': {}
 
   '@hono/node-server@2.1.1(hono@4.13.7)':
     dependencies:

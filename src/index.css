@@ -6,13 +6,50 @@
 @import "@fontsource-variable/geist-mono"; /* https://fontsource.org/fonts/geist-mono/install */
 @import "@fontsource-variable/yanone-kaffeesatz"; /* https://fontsource.org/fonts/yanone-kaffeesatz/install */
 @import "@fontsource-variable/roboto-condensed"; /* https://fontsource.org/fonts/roboto-condensed/install */
-@import "@fontsource-variable/roboto-mono"; /* https://fontsource.org/fonts/roboto-mono/install */
 
 /*
- * Diagram text only. Courier New ships latin and box-drawing in one face, so
- * │ rows share metrics without a second file. Roboto Mono is the webfont
- * fallback. Editor font is unchanged.
+ * Diagram text only. HTML <pre> uses each glyph's real advance; Monaco does
+ * not. Courier New's ┆ is narrower than │, and Geist Mono's box-drawing file
+ * is wider than its latin file — both shift columns. Cascadia Mono keeps
+ * letters, box-drawing, and arrows on one em. unicode-range is required so
+ * the latin file does not swallow U+2500 and show .notdef. Editor font is
+ * unchanged.
  */
+@font-face {
+    font-family: "Cascadia Mono Diagram";
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400;
+    src: local("Cascadia Mono"), local("Cascadia Code"), url("@fontsource/cascadia-mono/files/cascadia-mono-latin-400-normal.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: "Cascadia Mono Diagram";
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400;
+    src: local("Cascadia Mono"), local("Cascadia Code"), url("@fontsource/cascadia-mono/files/cascadia-mono-latin-ext-400-normal.woff2") format("woff2");
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+    font-family: "Cascadia Mono Diagram";
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400;
+    src: local("Cascadia Mono"), local("Cascadia Code"), url("@fontsource/cascadia-mono/files/cascadia-mono-symbols2-400-normal.woff2") format("woff2");
+    unicode-range: U+2000-2001, U+2004-2008, U+200A, U+23B8-23BD, U+2500-259F;
+}
+
+@font-face {
+    font-family: "Cascadia Mono Diagram";
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400;
+    src: local("Cascadia Mono"), local("Cascadia Code");
+    unicode-range: U+2190-21FF, U+25A0-25FF;
+}
 
 /* Custom fonts */
 
@@ -20,7 +57,7 @@
     --font-ui: "Yanone Kaffeesatz Variable", sans-serif;
     --font-condensed: "Roboto Condensed Variable", sans-serif;
     --font-code: "Geist Mono Variable", monospace;
-    --font-diagram: "Courier New", Courier, "Roboto Mono Variable", monospace;
+    --font-diagram: "Cascadia Mono Diagram", "Cascadia Mono", "Cascadia Code", Consolas, ui-monospace, monospace;
 }
 
 /* Standard shadcn https://zippystarter.com/tools/shadcn-ui-theme-generator */
