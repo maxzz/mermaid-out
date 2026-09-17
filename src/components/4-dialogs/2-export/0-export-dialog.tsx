@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Tabs, TabsList, TabsTrigger } from "@/ui/shadcn/tabs";
 import { BarsLoader } from "@/ui/local-ui";
 import { ErrorBoundary } from "@/ui/local-ui/8-error-boundary";
+import { DiagramText } from "@/components/2-main/2-editor-page/3-preview/7-diagram-text";
 import { EXPORT_FILENAME, EXPORT_FORMATS, isOpenExportDialogAtom } from "./a-types-export";
 
 export function ExportDialog() {
@@ -127,9 +128,7 @@ function ExportPreview({ format, result, pngUrl, pngSize }: { format: ExportForm
                     )
                     : format === 'text'
                         ? (
-                            <pre className="m-auto p-4 text-xs font-code text-foreground leading-[1.15]">
-                                {result.output}
-                            </pre>
+                            <DiagramText className="m-auto p-4" text={result.output} />
                         )
                         : format === 'png'
                             ? (pngUrl

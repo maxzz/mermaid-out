@@ -7,6 +7,7 @@ import { publishPreviewStatus, renderDiagram, useDebouncedValue } from "@/store/
 import { loadBeautifulMermaid } from "@/components/2-main/2-editor-page/2-editor/8-lazy-modules";
 import { usePreviewSourceLink } from "@/components/2-main/2-editor-page/4-source-link/preview";
 import { panModeAtom, PREVIEW_CONTENT_ATTR } from "./4-zoom-controls";
+import { DiagramText } from "./7-diagram-text";
 
 const RENDER_DEBOUNCE_MS = 300;
 
@@ -85,13 +86,12 @@ export function RenderView({ scrollRef }: RenderViewProps) {
                                 />
                             )
                             : (
-                                <pre
+                                <DiagramText
                                     {...{ [PREVIEW_CONTENT_ATTR]: '' }}
-                                    className="m-auto text-xs font-code text-foreground leading-[1.15]"
+                                    className="m-auto"
                                     style={contentStyle}
-                                >
-                                    {result.output}
-                                </pre>
+                                    text={result.output}
+                                />
                             )
                 }
             </div>
