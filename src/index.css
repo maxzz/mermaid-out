@@ -6,10 +6,12 @@
 @import "@fontsource-variable/geist-mono"; /* https://fontsource.org/fonts/geist-mono/install */
 @import "@fontsource-variable/yanone-kaffeesatz"; /* https://fontsource.org/fonts/yanone-kaffeesatz/install */
 @import "@fontsource-variable/roboto-condensed"; /* https://fontsource.org/fonts/roboto-condensed/install */
+@import "@fontsource-variable/roboto-mono"; /* https://fontsource.org/fonts/roboto-mono/install */
 
 /*
  * Diagram text only. Courier New ships latin and box-drawing in one face, so
- * │ rows share metrics without a second file. Editor font is unchanged.
+ * │ rows share metrics without a second file. Roboto Mono is the webfont
+ * fallback. Editor font is unchanged.
  */
 
 /* Custom fonts */
@@ -18,7 +20,7 @@
     --font-ui: "Yanone Kaffeesatz Variable", sans-serif;
     --font-condensed: "Roboto Condensed Variable", sans-serif;
     --font-code: "Geist Mono Variable", monospace;
-    --font-diagram: "Courier New", Courier, monospace;
+    --font-diagram: "Courier New", Courier, "Roboto Mono Variable", monospace;
 }
 
 /* Standard shadcn https://zippystarter.com/tools/shadcn-ui-theme-generator */

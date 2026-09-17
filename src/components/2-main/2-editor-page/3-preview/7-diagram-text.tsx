@@ -8,8 +8,9 @@ type DiagramTextProps = {
 } & Omit<HTMLAttributes<HTMLPreElement>, "children">;
 
 /**
- * Courier New keeps latin and box-drawing in one face. One block per row
- * still pins every line to the same em grid so `│` ink does not overlap.
+ * Courier New keeps latin and box-drawing in one face; Roboto Mono is the
+ * fallback. One block per row pins every line to the same em grid so `│`
+ * ink does not overlap.
  */
 export function DiagramText({ text, className, style, ...rest }: DiagramTextProps) {
     const lines = text.split("\n");
