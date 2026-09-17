@@ -8,9 +8,8 @@ type DiagramTextProps = {
 } & Omit<HTMLAttributes<HTMLPreElement>, "children">;
 
 /**
- * Diagram letters are Roboto Mono; box-drawing still comes from Geist Mono
- * symbols2. Inside a normal `<pre>`, mixed faces can make some rows taller
- * so `│` ink overlaps. One block per row keeps every line on the same em grid.
+ * Courier New keeps latin and box-drawing in one face. One block per row
+ * still pins every line to the same em grid so `│` ink does not overlap.
  */
 export function DiagramText({ text, className, style, ...rest }: DiagramTextProps) {
     const lines = text.split("\n");
