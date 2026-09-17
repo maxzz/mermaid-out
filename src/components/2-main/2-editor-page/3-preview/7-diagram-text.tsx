@@ -8,10 +8,9 @@ type DiagramTextProps = {
 } & Omit<HTMLAttributes<HTMLPreElement>, "children">;
 
 /**
- * Geist Mono loads box-drawing from a second face (symbols2) whose vertical
- * metrics differ from latin. Inside a normal `<pre>`, that makes some rows
- * taller than others so `│` ink overlaps into thick segments. One block per
- * row keeps every line on the same em grid.
+ * Diagram letters are Roboto Mono; box-drawing still comes from Geist Mono
+ * symbols2. Inside a normal `<pre>`, mixed faces can make some rows taller
+ * so `│` ink overlaps. One block per row keeps every line on the same em grid.
  */
 export function DiagramText({ text, className, style, ...rest }: DiagramTextProps) {
     const lines = text.split("\n");
