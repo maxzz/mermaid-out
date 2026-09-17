@@ -18,11 +18,31 @@ export interface AsciiSettings {
     paddingY: number;       // vertical spacing between nodes
 }
 
+export const NODE_PLACEMENT_STRATEGIES = ['SIMPLE', 'NETWORK_SIMPLEX', 'LINEAR_SEGMENTS', 'BRANDES_KOEPF'] as const;
+export type NodePlacementStrategy = typeof NODE_PLACEMENT_STRATEGIES[number];
+
+export const CYCLE_BREAKING_STRATEGIES = ['GREEDY', 'DEPTH_FIRST', 'INTERACTIVE', 'MODEL_ORDER', 'GREEDY_MODEL_ORDER'] as const;
+export type CycleBreakingStrategy = typeof CYCLE_BREAKING_STRATEGIES[number];
+
+export const CONSIDER_MODEL_ORDERS = ['NONE', 'NODES_AND_EDGES', 'PREFER_EDGES', 'PREFER_NODES'] as const;
+export type ConsiderModelOrder = typeof CONSIDER_MODEL_ORDERS[number];
+
+/** Mermaid-compatible ELK knobs (see mermaid `config.elk`). */
+export interface ElkLayoutSettings {
+    mergeEdges: boolean;
+    thoroughness: number;
+    nodePlacementStrategy: NodePlacementStrategy;
+    cycleBreakingStrategy: CycleBreakingStrategy;
+    considerModelOrder: ConsiderModelOrder;
+    forceNodeModelOrder: boolean;
+}
+
 export interface SvgLayoutSettings {
     padding: number;        // canvas padding in px
     nodeSpacing: number;    // horizontal spacing between sibling nodes
     layerSpacing: number;   // vertical spacing between layers
     font: string;           // font family for diagram text
+    elk: ElkLayoutSettings; // SVG layout engine (ELK)
 }
 
 export interface MermaidSettings {
@@ -35,6 +55,16 @@ export interface MermaidSettings {
     svg: SvgLayoutSettings;
     pngScale: PngScale;         // PNG export scale
 }
+
+/** Mermaid's ELK defaults, except mergeEdges (beautiful-mermaid bundles fan-in/out). */
+export const DEFAULT_ELK_LAYOUT: ElkLayoutSettings = {
+    mergeEdges: true,
+    thoroughness: 3,
+    nodePlacementStrategy: 'BRANDES_KOEPF',
+    cycleBreakingStrategy: 'GREEDY_MODEL_ORDER',
+    considerModelOrder: 'NODES_AND_EDGES',
+    forceNodeModelOrder: false,
+};
 
 export const DIAGRAM_FONTS = [
     { value: 'Geist Variable', label: 'Geist' },
@@ -60,6 +90,7 @@ const DEFAULT_SETTINGS: MermaidSettings = {
         nodeSpacing: 24,
         layerSpacing: 40,
         font: DIAGRAM_FONTS[0].value,
+        elk: { ...DEFAULT_ELK_LAYOUT },
     },
     pngScale: 2,
 };
@@ -75,7 +106,11 @@ function loadSettings(): MermaidSettings {
                 ...DEFAULT_SETTINGS,
                 ...parsed,
                 ascii: { ...DEFAULT_SETTINGS.ascii, ...parsed.ascii },
-                svg: { ...DEFAULT_SETTINGS.svg, ...parsed.svg },
+                svg: {
+                    ...DEFAULT_SETTINGS.svg,
+                    ...parsed.svg,
+                    elk: { ...DEFAULT_SETTINGS.svg.elk, ...parsed.svg?.elk },
+                },
             };
         }
     } catch (e) {
@@ -119,4 +154,8 @@ export function zoomOut() {
 
 export function zoomReset() {
     setZoom(1);
+}
+
+export function resetSvgElkLayout() {
+    mermaidSettings.svg.elk = { ...DEFAULT_ELK_LAYOUT };
 }

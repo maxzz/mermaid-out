@@ -3,6 +3,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { defineConfig, type PluginOption } from 'vite';
 import react from '@vitejs/plugin-react';
 import visualizer from 'rollup-plugin-visualizer';
+import { isBeautifulMermaidBundle, patchBeautifulMermaidElkSource } from './src/utils/patch-beautiful-mermaid-elk.ts';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -10,7 +11,12 @@ export default defineConfig({
     server: {
         port: 3000,
     },
-    plugins: [react(), tailwindcss(), bundleVisualizer()],
+    plugins: [react(), tailwindcss(), patchBeautifulMermaidElk(), bundleVisualizer()],
+    optimizeDeps: {
+        rolldownOptions: {
+            plugins: [patchBeautifulMermaidElk()],
+        },
+    },
     resolve: {
         alias: {
             '@': path.resolve(import.meta.dirname, './src'),
@@ -90,6 +96,19 @@ function npmPackageName(id: string): string | undefined {
 }
 
 const NODE_MODULES = '/node_modules/';
+
+function patchBeautifulMermaidElk(): PluginOption {
+    return {
+        name: 'patch-beautiful-mermaid-elk',
+        enforce: 'pre',
+        transform(code, id) {
+            if (!isBeautifulMermaidBundle(id)) {
+                return;
+            }
+            return patchBeautifulMermaidElkSource(code);
+        },
+    };
+}
 
 //---------------------------------------------------------------------------
 // Bundle Visualizer

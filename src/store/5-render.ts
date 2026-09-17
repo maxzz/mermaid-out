@@ -56,6 +56,8 @@ export function buildSvgOptions(bm: BeautifulMermaidModule, settings: RenderSett
         padding: settings.svg.padding,
         nodeSpacing: settings.svg.nodeSpacing,
         layerSpacing: settings.svg.layerSpacing,
+        // Extra ELK fields: read by the Vite-patched beautiful-mermaid bundle.
+        ...settings.svg.elk,
     };
 }
 
