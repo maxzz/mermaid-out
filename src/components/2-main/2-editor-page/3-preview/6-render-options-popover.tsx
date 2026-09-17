@@ -10,6 +10,7 @@ import { Popover, PopoverContent, PopoverDescription, PopoverHeader, PopoverTitl
 import { Select, SelectContent, SelectTrigger, SelectValue } from "@/ui/shadcn/select";
 import { Slider } from "@/ui/shadcn/slider";
 import { Switch } from "@/ui/shadcn/switch";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/ui/shadcn/tooltip";
 
 export function RenderOptionsPopover() {
     return (
@@ -35,13 +36,15 @@ export function RenderOptionsPopover() {
                     </PopoverDescription>
                 </PopoverHeader>
 
-                <div className="flex flex-col gap-4">
-                    <Suspense fallback={<div className="py-6 flex justify-center"><BarsLoader /></div>}>
-                        <DiagramThemeSection />
-                    </Suspense>
-                    <SvgLayoutSection />
-                    <TextOutputSection />
-                </div>
+                <TooltipProvider delayDuration={0}>
+                    <div className="flex flex-col gap-4">
+                        <Suspense fallback={<div className="py-6 flex justify-center"><BarsLoader /></div>}>
+                            <DiagramThemeSection />
+                        </Suspense>
+                        <SvgLayoutSection />
+                        <TextOutputSection />
+                    </div>
+                </TooltipProvider>
             </PopoverContent>
         </Popover>
     );
@@ -62,7 +65,7 @@ function DiagramThemeSection() {
 
     return (
         <Section title="Diagram theme">
-            <Row label="Colors" hint="Auto follows the app light/dark mode">
+            <Row label="Colors" hint="Color palette for the diagram. Auto follows the app light or dark theme.">
                 <Select value={select.listValue} open={select.open} onOpenChange={select.onOpenChange} onValueChange={select.onValueChange}>
                     <SelectTrigger size="sm" className="w-40">
                         <SelectValue>
@@ -93,7 +96,7 @@ function SvgLayoutSection() {
 
     return (
         <Section title="SVG layout">
-            <Row label="Font">
+            <Row label="Font" hint="Typeface used for node labels and other diagram text.">
                 <Select value={select.listValue} open={select.open} onOpenChange={select.onOpenChange} onValueChange={select.onValueChange}>
                     <SelectTrigger size="sm" className="w-40">
                         <SelectValue>
@@ -112,9 +115,33 @@ function SvgLayoutSection() {
                 </Select>
             </Row>
 
-            <SliderRow label="Padding" value={svg.padding} min={0} max={120} step={4} onChange={(v) => { mermaidSettings.svg.padding = v; }} />
-            <SliderRow label="Node spacing" value={svg.nodeSpacing} min={4} max={120} step={4} onChange={(v) => { mermaidSettings.svg.nodeSpacing = v; }} />
-            <SliderRow label="Layer spacing" value={svg.layerSpacing} min={4} max={160} step={4} onChange={(v) => { mermaidSettings.svg.layerSpacing = v; }} />
+            <SliderRow
+                label="Padding"
+                hint="Empty space around the diagram inside the SVG canvas."
+                value={svg.padding}
+                min={0}
+                max={120}
+                step={4}
+                onChange={(v) => { mermaidSettings.svg.padding = v; }}
+            />
+            <SliderRow
+                label="Node spacing"
+                hint="Horizontal distance between sibling nodes in the same layer."
+                value={svg.nodeSpacing}
+                min={4}
+                max={120}
+                step={4}
+                onChange={(v) => { mermaidSettings.svg.nodeSpacing = v; }}
+            />
+            <SliderRow
+                label="Layer spacing"
+                hint="Vertical distance between successive layers of the diagram."
+                value={svg.layerSpacing}
+                min={4}
+                max={160}
+                step={4}
+                onChange={(v) => { mermaidSettings.svg.layerSpacing = v; }}
+            />
         </Section>
     );
 }
@@ -124,12 +151,28 @@ function TextOutputSection() {
 
     return (
         <Section title="Text output">
-            <Row label="Pure ASCII" hint="Off: Unicode box-drawing characters">
+            <Row label="Pure ASCII" hint="When on, the text diagram uses only ASCII characters. Off uses Unicode box-drawing characters.">
                 <Switch className="-mr-1 scale-65" checked={ascii.useAscii} onCheckedChange={(v) => { mermaidSettings.ascii.useAscii = v; }} />
             </Row>
 
-            <SliderRow label="Horizontal spacing" value={ascii.paddingX} min={1} max={20} step={1} onChange={(v) => { mermaidSettings.ascii.paddingX = v; }} />
-            <SliderRow label="Vertical spacing" value={ascii.paddingY} min={1} max={20} step={1} onChange={(v) => { mermaidSettings.ascii.paddingY = v; }} />
+            <SliderRow
+                label="Horizontal spacing"
+                hint="Horizontal padding between nodes in the text diagram."
+                value={ascii.paddingX}
+                min={1}
+                max={20}
+                step={1}
+                onChange={(v) => { mermaidSettings.ascii.paddingX = v; }}
+            />
+            <SliderRow
+                label="Vertical spacing"
+                hint="Vertical padding between nodes in the text diagram."
+                value={ascii.paddingY}
+                min={1}
+                max={20}
+                step={1}
+                onChange={(v) => { mermaidSettings.ascii.paddingY = v; }}
+            />
         </Section>
     );
 }
@@ -148,16 +191,11 @@ function Section({ title, children }: { title: string; children: ReactNode; }) {
     );
 }
 
-function Row({ label, hint, children }: { label: string; hint?: string; children: ReactNode; }) {
+function Row({ label, hint, children }: { label: string; hint: string; children: ReactNode; }) {
     const id = useId();
     return (
         <div className="flex items-center justify-between gap-3">
-            <div className="flex flex-col gap-0.5">
-                <Label htmlFor={id}>
-                    {label}
-                </Label>
-                {hint && <span className="text-[.7rem] text-muted-foreground">{hint}</span>}
-            </div>
+            <HintLabel htmlFor={id} hint={hint}>{label}</HintLabel>
             <div id={id} className="shrink-0">
                 {children}
             </div>
@@ -167,6 +205,7 @@ function Row({ label, hint, children }: { label: string; hint?: string; children
 
 type SliderRowProps = {
     label: string;
+    hint: string;
     value: number;
     min: number;
     max: number;
@@ -174,15 +213,30 @@ type SliderRowProps = {
     onChange: (value: number) => void;
 };
 
-function SliderRow({ label, value, min, max, step, onChange }: SliderRowProps) {
+function SliderRow({ label, hint, value, min, max, step, onChange }: SliderRowProps) {
     return (
         <div className="flex flex-col gap-1.5">
             <div className="flex items-center justify-between">
-                <Label>{label}</Label>
+                <HintLabel hint={hint}>{label}</HintLabel>
                 <span className="text-[.7rem] font-mono tabular-nums text-muted-foreground">{value}</span>
             </div>
             <Slider value={[value]} min={min} max={max} step={step} onValueChange={([v]) => onChange(v)} />
         </div>
+    );
+}
+
+function HintLabel({ htmlFor, hint, children }: { htmlFor?: string; hint: string; children: ReactNode; }) {
+    return (
+        <Tooltip>
+            <TooltipTrigger asChild>
+                <Label htmlFor={htmlFor} className="cursor-help underline decoration-dotted decoration-muted-foreground/60 underline-offset-2">
+                    {children}
+                </Label>
+            </TooltipTrigger>
+            <TooltipContent side="left" sideOffset={8} className="z-[100] max-w-56 text-left whitespace-normal">
+                {hint}
+            </TooltipContent>
+        </Tooltip>
     );
 }
 
