@@ -127,7 +127,7 @@ function ExportPreview({ format, result, pngUrl, pngSize }: { format: ExportForm
                     )
                     : format === 'text'
                         ? (
-                            <pre className="m-auto p-4 text-xs font-code text-foreground leading-[1.15]">
+                            <pre className="m-auto p-4 text-xs font-code text-foreground leading-none">
                                 {result.output}
                             </pre>
                         )

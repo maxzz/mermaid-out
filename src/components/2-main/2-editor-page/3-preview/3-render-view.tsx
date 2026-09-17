@@ -87,7 +87,7 @@ export function RenderView({ scrollRef }: RenderViewProps) {
                             : (
                                 <pre
                                     {...{ [PREVIEW_CONTENT_ATTR]: '' }}
-                                    className="m-auto text-xs font-code text-foreground leading-[1.15]"
+                                    className="m-auto text-xs font-code text-foreground leading-none"
                                     style={contentStyle}
                                 >
                                     {result.output}
