@@ -50,13 +50,6 @@ export function RenderOptionsPopover() {
     );
 }
 
-function keepOpenForSelect(event: { target: EventTarget | null; preventDefault: () => void; }) {
-    const el = event.target as HTMLElement | null;
-    if (el?.closest?.('[data-slot="select-content"]')) {
-        event.preventDefault();
-    }
-}
-
 function DiagramThemeSection() {
     const bm = use(loadBeautifulMermaid());
     const { diagramTheme } = useSnapshot(mermaidSettings);
@@ -64,29 +57,29 @@ function DiagramThemeSection() {
     const select = useSelectPreview(diagramTheme, (v) => { mermaidSettings.diagramTheme = v as DiagramTheme; });
 
     return (
-        <Section title="Diagram theme">
-            <Row label="Colors" hint="Color palette for the diagram. Auto follows the app light or dark theme.">
-                <Select value={select.listValue} open={select.open} onOpenChange={select.onOpenChange} onValueChange={select.onValueChange}>
-                    <SelectTrigger size="sm" className="w-40">
-                        <SelectValue>
-                            <ThemeLabel name={diagramTheme} themes={bm.THEMES} />
-                        </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent position="popper" align="end">
-                        <PreviewSelectItem value="auto" onPreview={select.preview}>
-                            <ThemeLabel name="auto" themes={bm.THEMES} />
-                        </PreviewSelectItem>
-                        {themeNames.map(
-                            (name) => (
-                                <PreviewSelectItem key={name} value={name} onPreview={select.preview}>
-                                    <ThemeLabel name={name} themes={bm.THEMES} />
-                                </PreviewSelectItem>
-                            )
-                        )}
-                    </SelectContent>
-                </Select>
-            </Row>
-        </Section>
+        <Row label="Diagram theme" hint="Color palette for the diagram. Auto follows the app light or dark theme.">
+            <Select value={select.listValue} open={select.open} onOpenChange={select.onOpenChange} onValueChange={select.onValueChange}>
+                <SelectTrigger size="sm" className="w-40">
+                    <SelectValue>
+                        <ThemeLabel name={diagramTheme} themes={bm.THEMES} />
+                    </SelectValue>
+                </SelectTrigger>
+
+                <SelectContent position="popper" align="end">
+                    <PreviewSelectItem value="auto" onPreview={select.preview}>
+                        <ThemeLabel name="auto" themes={bm.THEMES} />
+                    </PreviewSelectItem>
+
+                    {themeNames.map(
+                        (name) => (
+                            <PreviewSelectItem key={name} value={name} onPreview={select.preview}>
+                                <ThemeLabel name={name} themes={bm.THEMES} />
+                            </PreviewSelectItem>
+                        )
+                    )}
+                </SelectContent>
+            </Select>
+        </Row>
     );
 }
 
@@ -233,7 +226,7 @@ function HintLabel({ htmlFor, hint, children }: { htmlFor?: string; hint: string
                     {children}
                 </Label>
             </TooltipTrigger>
-            <TooltipContent side="left" sideOffset={8} className="z-[100] max-w-56 text-left whitespace-normal">
+            <TooltipContent side="left" sideOffset={8} className="z-100 max-w-56 text-left whitespace-normal">
                 {hint}
             </TooltipContent>
         </Tooltip>
@@ -266,4 +259,14 @@ function ThemeSwatch({ bg, fg }: { bg: string; fg: string; }) {
 function FontLabel({ fontFamily }: { fontFamily: string; }) {
     const label = DIAGRAM_FONTS.find((font) => font.value === fontFamily)?.label ?? fontFamily;
     return <span style={{ fontFamily }}>{label}</span>;
+}
+
+//---------------------------------------------------------------------------
+// Helpers
+
+function keepOpenForSelect(event: { target: EventTarget | null; preventDefault: () => void; }) {
+    const el = event.target as HTMLElement | null;
+    if (el?.closest?.('[data-slot="select-content"]')) {
+        event.preventDefault();
+    }
 }
