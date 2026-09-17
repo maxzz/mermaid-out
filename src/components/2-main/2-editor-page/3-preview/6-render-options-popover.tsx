@@ -1,9 +1,6 @@
 import { type ReactNode, Suspense, use, useId } from "react";
 import { useSnapshot } from "valtio";
 import { Settings2Icon } from "lucide-react";
-import { DIAGRAM_FONTS, type DiagramTheme, mermaidSettings } from "@/store/2-mermaid-settings";
-import { loadBeautifulMermaid } from "@/components/2-main/2-editor-page/2-editor/8-lazy-modules";
-import { BarsLoader, PreviewSelectItem, useSelectPreview } from "@/ui/local-ui";
 import { Button } from "@/ui/shadcn/button";
 import { Label } from "@/ui/shadcn/label";
 import { Popover, PopoverContent, PopoverDescription, PopoverHeader, PopoverTitle, PopoverTrigger } from "@/ui/shadcn/popover";
@@ -11,6 +8,10 @@ import { Select, SelectContent, SelectTrigger, SelectValue } from "@/ui/shadcn/s
 import { Slider } from "@/ui/shadcn/slider";
 import { Switch } from "@/ui/shadcn/switch";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/ui/shadcn/tooltip";
+
+import { DIAGRAM_FONTS, type DiagramTheme, mermaidSettings } from "@/store/2-mermaid-settings";
+import { BarsLoader, PreviewSelectItem, useSelectPreview } from "@/ui/local-ui";
+import { loadBeautifulMermaid } from "@/components/2-main/2-editor-page/2-editor/8-lazy-modules";
 
 export function RenderOptionsPopover() {
     return (
@@ -23,26 +24,28 @@ export function RenderOptionsPopover() {
 
             <PopoverContent
                 align="end"
-                className="p-3 w-80 max-h-[min(70vh,32rem)] overflow-y-auto"
+                className="p-3 pt-0 w-80 max-h-[min(70vh,32rem)] rounded-sm overflow-y-auto"
                 onOpenAutoFocus={(e) => e.preventDefault()}
                 onInteractOutside={keepOpenForSelect}
             >
                 <PopoverHeader>
-                    <PopoverTitle className="text-sm font-medium">
+                    <PopoverTitle className="-mx-3 px-3 pt-3 text-xs font-medium bg-muted border-b border-border shadow-xs pb-2">
                         Render options
                     </PopoverTitle>
-                    <PopoverDescription className="text-[0.65rem] text-muted-foreground">
+                    <PopoverDescription className="text-[0.65rem] text-muted-foreground sr-only">
                         Diagram theme, SVG layout, and text output.
                     </PopoverDescription>
                 </PopoverHeader>
 
-                <TooltipProvider delayDuration={0}>
-                    <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] gap-x-3 gap-y-4 items-center">
+                <TooltipProvider delayDuration={500}>
+                    <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] gap-x-2 gap-y-2 items-center">
+
                         <Suspense fallback={<div className="col-span-full py-6 flex justify-center"><BarsLoader /></div>}>
                             <DiagramThemeSection />
                         </Suspense>
                         <SvgLayoutSection />
                         <TextOutputSection />
+
                     </div>
                 </TooltipProvider>
             </PopoverContent>
@@ -175,8 +178,8 @@ function TextOutputSection() {
 
 function Section({ title, children }: { title: string; children: ReactNode; }) {
     return (
-        <section className="col-span-full grid grid-cols-subgrid gap-y-2">
-            <h3 className="col-span-full text-[.7rem] font-semibold text-muted-foreground uppercase tracking-wider">
+        <section className="col-span-full grid grid-cols-subgrid gap-y-1">
+            <h3 className="col-span-full text-[0.7rem] font-semibold border-b border-border pb-1">
                 {title}
             </h3>
             {children}
@@ -184,13 +187,15 @@ function Section({ title, children }: { title: string; children: ReactNode; }) {
     );
 }
 
-const optionRowClasses = "col-span-full grid grid-cols-subgrid items-center min-h-7";
+const optionRowClasses = "col-span-full grid grid-cols-subgrid items-center min-h-6";
 
 function Row({ label, hint, children }: { label: string; hint: string; children: ReactNode; }) {
     const id = useId();
     return (
         <div className={optionRowClasses}>
-            <HintLabel htmlFor={id} hint={hint}>{label}</HintLabel>
+            <HintLabel htmlFor={id} hint={hint}>
+                {label}
+            </HintLabel>
             <div id={id} className="col-span-2 justify-self-end">
                 {children}
             </div>
@@ -222,10 +227,11 @@ function HintLabel({ htmlFor, hint, children }: { htmlFor?: string; hint: string
     return (
         <Tooltip>
             <TooltipTrigger asChild>
-                <Label htmlFor={htmlFor} className="cursor-help whitespace-nowrap underline decoration-dotted decoration-muted-foreground/60 underline-offset-2">
+                <Label htmlFor={htmlFor} className="font-normal cursor-help whitespace-nowrap">
                     {children}
                 </Label>
             </TooltipTrigger>
+
             <TooltipContent side="left" sideOffset={8} className="z-100 max-w-56 text-left whitespace-normal">
                 {hint}
             </TooltipContent>

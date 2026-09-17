@@ -1,10 +1,11 @@
 import { type ComponentProps, type RefObject } from "react";
 import { atom, useAtom } from "jotai";
 import { useSnapshot } from "valtio";
-import { HandIcon, MaximizeIcon, ZoomInIcon, ZoomOutIcon } from "lucide-react";
 import { classNames } from "@/utils";
-import { mermaidSettings, setZoom, zoomIn, zoomOut, ZOOM_MAX, ZOOM_MIN } from "@/store/2-mermaid-settings";
+import { HandIcon, MaximizeIcon, ZoomInIcon, ZoomOutIcon } from "lucide-react";
 import { Button } from "@/ui/shadcn/button";
+
+import { mermaidSettings, setZoom, zoomIn, zoomOut, ZOOM_MAX, ZOOM_MIN } from "@/store/2-mermaid-settings";
 
 /** Pan mode: drag the preview to scroll. Transient UI state. */
 export const panModeAtom = atom(false);
