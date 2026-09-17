@@ -3,6 +3,7 @@ import { proxy } from 'valtio';
 import type { AsciiRenderOptions, DiagramColors, RenderOptions } from 'beautiful-mermaid'; // `import type` only: keep the lazy chunk lazy
 import type { BeautifulMermaidModule } from '@/components/2-main/2-editor-page/2-editor/8-lazy-modules';
 import { resolveCssVar } from '@/utils/export-utils';
+import { fixMermaidSvgStrokes } from '@/utils/fix-mermaid-svg';
 import { type DiagramTheme, type MermaidSettings, type OutputFormat } from './2-mermaid-settings';
 
 export type RenderResult = {
@@ -77,7 +78,7 @@ export function renderDiagram(bm: BeautifulMermaidModule, source: string, settin
     const t0 = performance.now();
     try {
         const output = format === 'svg'
-            ? bm.renderMermaidSVG(text, buildSvgOptions(bm, settings, forExport))
+            ? fixMermaidSvgStrokes(bm.renderMermaidSVG(text, buildSvgOptions(bm, settings, forExport)))
             : bm.renderMermaidASCII(text, buildAsciiOptions(settings));
 
         return { format, output, error: null, ms: performance.now() - t0 };
