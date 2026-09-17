@@ -4,6 +4,7 @@ import type { AsciiRenderOptions, DiagramColors, RenderOptions } from 'beautiful
 import type { BeautifulMermaidModule } from '@/components/2-main/2-editor-page/2-editor/8-lazy-modules';
 import { resolveCssVar } from '@/utils/export-utils';
 import { fixMermaidAsciiBoxes } from '@/utils/fix-mermaid-ascii';
+import { detectGraphDirection, routeDiamondEdges } from '@/utils/route-diamond-edges';
 import { type DiagramTheme, type MermaidSettings, type OutputFormat } from './2-mermaid-settings';
 
 export type RenderResult = {
@@ -80,7 +81,7 @@ export function renderDiagram(bm: BeautifulMermaidModule, source: string, settin
     const t0 = performance.now();
     try {
         const output = format === 'svg'
-            ? bm.renderMermaidSVG(text, buildSvgOptions(bm, settings, forExport))
+            ? routeDiamondEdges(bm.renderMermaidSVG(text, buildSvgOptions(bm, settings, forExport)), detectGraphDirection(text))
             : fixMermaidAsciiBoxes(bm.renderMermaidASCII(text, buildAsciiOptions(settings)));
 
         return { format, output, error: null, ms: performance.now() - t0 };
