@@ -1,4 +1,4 @@
-import { type ReactNode, Suspense, use, useId } from "react";
+import { type ComponentProps, type ReactNode, Suspense, use, useEffect, useId, useRef, useState } from "react";
 import { useSnapshot } from "valtio";
 import { Settings2Icon } from "lucide-react";
 import { DIAGRAM_FONTS, type DiagramTheme, mermaidSettings } from "@/store/2-mermaid-settings";
@@ -58,23 +58,26 @@ function DiagramThemeSection() {
     const bm = use(loadBeautifulMermaid());
     const { diagramTheme } = useSnapshot(mermaidSettings);
     const themeNames = Object.keys(bm.THEMES);
+    const select = useSelectPreview(diagramTheme, (v) => { mermaidSettings.diagramTheme = v as DiagramTheme; });
 
     return (
         <Section title="Diagram theme">
             <Row label="Colors" hint="Auto follows the app light/dark mode">
-                <Select value={diagramTheme} onValueChange={(v) => { mermaidSettings.diagramTheme = v as DiagramTheme; }}>
+                <Select value={select.listValue} open={select.open} onOpenChange={select.onOpenChange} onValueChange={select.onValueChange}>
                     <SelectTrigger size="sm" className="w-40">
-                        <SelectValue />
+                        <SelectValue>
+                            <ThemeLabel name={diagramTheme} themes={bm.THEMES} />
+                        </SelectValue>
                     </SelectTrigger>
                     <SelectContent position="popper" align="end">
-                        <SelectItem value="auto">
-                            <ThemeSwatch bg="var(--background)" fg="var(--foreground)" /> Auto (app theme)
-                        </SelectItem>
+                        <PreviewSelectItem value="auto" onPreview={select.preview}>
+                            <ThemeLabel name="auto" themes={bm.THEMES} />
+                        </PreviewSelectItem>
                         {themeNames.map(
                             (name) => (
-                                <SelectItem key={name} value={name}>
-                                    <ThemeSwatch bg={bm.THEMES[name].bg} fg={bm.THEMES[name].accent ?? bm.THEMES[name].fg} /> {name}
-                                </SelectItem>
+                                <PreviewSelectItem key={name} value={name} onPreview={select.preview}>
+                                    <ThemeLabel name={name} themes={bm.THEMES} />
+                                </PreviewSelectItem>
                             )
                         )}
                     </SelectContent>
@@ -86,20 +89,23 @@ function DiagramThemeSection() {
 
 function SvgLayoutSection() {
     const { svg } = useSnapshot(mermaidSettings);
+    const select = useSelectPreview(svg.font, (v) => { mermaidSettings.svg.font = v; });
 
     return (
         <Section title="SVG layout">
             <Row label="Font">
-                <Select value={svg.font} onValueChange={(v) => { mermaidSettings.svg.font = v; }}>
+                <Select value={select.listValue} open={select.open} onOpenChange={select.onOpenChange} onValueChange={select.onValueChange}>
                     <SelectTrigger size="sm" className="w-40">
-                        <SelectValue />
+                        <SelectValue>
+                            <FontLabel fontFamily={svg.font} />
+                        </SelectValue>
                     </SelectTrigger>
                     <SelectContent position="popper" align="end">
                         {DIAGRAM_FONTS.map(
                             (font) => (
-                                <SelectItem key={font.value} value={font.value}>
-                                    <span style={{ fontFamily: font.value }}>{font.label}</span>
-                                </SelectItem>
+                                <PreviewSelectItem key={font.value} value={font.value} onPreview={select.preview}>
+                                    <FontLabel fontFamily={font.value} />
+                                </PreviewSelectItem>
                             )
                         )}
                     </SelectContent>
@@ -180,5 +186,136 @@ function ThemeSwatch({ bg, fg }: { bg: string; fg: string; }) {
         <span className="size-3.5 border border-border rounded-sm overflow-hidden inline-flex" style={{ backgroundColor: bg }}>
             <span className="m-auto size-1.5 rounded-full" style={{ backgroundColor: fg }} />
         </span>
+    );
+}
+
+function ThemeLabel({ name, themes }: { name: string; themes: Record<string, { bg: string; fg: string; accent?: string; }>; }) {
+    if (name === "auto") {
+        return (
+            <>
+                <ThemeSwatch bg="var(--background)" fg="var(--foreground)" /> Auto (app theme)
+            </>
+        );
+    }
+
+    const theme = themes[name];
+    return (
+        <>
+            <ThemeSwatch bg={theme?.bg ?? "var(--background)"} fg={theme?.accent ?? theme?.fg ?? "var(--foreground)"} /> {name}
+        </>
+    );
+}
+
+function FontLabel({ fontFamily }: { fontFamily: string; }) {
+    const label = DIAGRAM_FONTS.find((font) => font.value === fontFamily)?.label ?? fontFamily;
+    return <span style={{ fontFamily }}>{label}</span>;
+}
+
+const PREVIEW_VALUE_ATTR = "data-preview-value";
+
+/**
+ * Highlighted options live-preview in the diagram; click/Enter commits;
+ * closing without a selection (Escape) restores the value from before open.
+ */
+function useSelectPreview<T extends string>(live: T, apply: (value: T) => void) {
+    const originRef = useRef(live);
+    const didCommitRef = useRef(false);
+    const liveRef = useRef(live);
+    const applyRef = useRef(apply);
+    const [open, setOpen] = useState(false);
+
+    liveRef.current = live;
+    applyRef.current = apply;
+
+    function preview(value: string) {
+        if (value !== liveRef.current) {
+            applyRef.current(value as T);
+        }
+    }
+
+    useEffect(
+        () => {
+            if (!open) {
+                return;
+            }
+
+            function previewValue(value: string | null | undefined) {
+                if (value) {
+                    preview(value);
+                }
+            }
+
+            function previewFromActive() {
+                const el = document.activeElement as HTMLElement | null;
+                previewValue(el?.getAttribute(PREVIEW_VALUE_ATTR) ?? el?.closest(`[${PREVIEW_VALUE_ATTR}]`)?.getAttribute(PREVIEW_VALUE_ATTR));
+            }
+
+            function onKeyDown(event: KeyboardEvent) {
+                const items = [...document.querySelectorAll(`[${PREVIEW_VALUE_ATTR}]:not([data-disabled])`)];
+                if (items.length === 0) {
+                    return;
+                }
+
+                const index = items.indexOf(document.activeElement as Element);
+                let nextIndex = index;
+
+                if (event.key === "Home") {
+                    nextIndex = 0;
+                } else if (event.key === "End") {
+                    nextIndex = items.length - 1;
+                } else if (event.key === "ArrowDown") {
+                    nextIndex = Math.min(index + 1, items.length - 1);
+                } else if (event.key === "ArrowUp") {
+                    nextIndex = Math.max((index < 0 ? items.length : index) - 1, 0);
+                } else {
+                    return;
+                }
+
+                previewValue(items[nextIndex]?.getAttribute(PREVIEW_VALUE_ATTR));
+            }
+
+            document.addEventListener("focusin", previewFromActive);
+            document.addEventListener("keydown", onKeyDown, true);
+            return () => {
+                document.removeEventListener("focusin", previewFromActive);
+                document.removeEventListener("keydown", onKeyDown, true);
+            };
+        },
+        [open],
+    );
+
+    function onOpenChange(next: boolean) {
+        if (next) {
+            originRef.current = liveRef.current;
+            didCommitRef.current = false;
+        } else if (!didCommitRef.current) {
+            applyRef.current(originRef.current);
+        }
+        setOpen(next);
+    }
+
+    function onValueChange(value: string) {
+        didCommitRef.current = true;
+        applyRef.current(value as T);
+    }
+
+    return {
+        open,
+        listValue: open ? originRef.current : live,
+        onOpenChange,
+        onValueChange,
+        preview,
+    };
+}
+
+function PreviewSelectItem({ value, onPreview, ...rest }: ComponentProps<typeof SelectItem> & { onPreview: (value: string) => void; }) {
+    return (
+        <SelectItem
+            {...rest}
+            value={value}
+            data-preview-value={value}
+            onFocus={() => onPreview(value)}
+            onPointerMove={() => onPreview(value)}
+        />
     );
 }
