@@ -125,7 +125,7 @@ function TextOutputSection() {
     return (
         <Section title="Text output">
             <Row label="Pure ASCII" hint="Off: Unicode box-drawing characters">
-                <Switch checked={ascii.useAscii} onCheckedChange={(v) => { mermaidSettings.ascii.useAscii = v; }} />
+                <Switch className="-mr-1 scale-65" checked={ascii.useAscii} onCheckedChange={(v) => { mermaidSettings.ascii.useAscii = v; }} />
             </Row>
 
             <SliderRow label="Horizontal spacing" value={ascii.paddingX} min={1} max={20} step={1} onChange={(v) => { mermaidSettings.ascii.paddingX = v; }} />
@@ -133,6 +133,9 @@ function TextOutputSection() {
         </Section>
     );
 }
+
+//---------------------------------------------------------------------------
+// Components
 
 function Section({ title, children }: { title: string; children: ReactNode; }) {
     return (
@@ -150,7 +153,9 @@ function Row({ label, hint, children }: { label: string; hint?: string; children
     return (
         <div className="flex items-center justify-between gap-3">
             <div className="flex flex-col gap-0.5">
-                <Label htmlFor={id}>{label}</Label>
+                <Label htmlFor={id}>
+                    {label}
+                </Label>
                 {hint && <span className="text-[.7rem] text-muted-foreground">{hint}</span>}
             </div>
             <div id={id} className="shrink-0">
@@ -181,21 +186,11 @@ function SliderRow({ label, value, min, max, step, onChange }: SliderRowProps) {
     );
 }
 
-function ThemeSwatch({ bg, fg }: { bg: string; fg: string; }) {
-    return (
-        <span className="size-3.5 border border-border rounded-sm overflow-hidden inline-flex" style={{ backgroundColor: bg }}>
-            <span className="m-auto size-1.5 rounded-full" style={{ backgroundColor: fg }} />
-        </span>
-    );
-}
-
 function ThemeLabel({ name, themes }: { name: string; themes: Record<string, { bg: string; fg: string; accent?: string; }>; }) {
     if (name === "auto") {
-        return (
-            <>
-                <ThemeSwatch bg="var(--background)" fg="var(--foreground)" /> Auto (app theme)
-            </>
-        );
+        return (<>
+            <ThemeSwatch bg="var(--background)" fg="var(--foreground)" /> Auto (app theme)
+        </>);
     }
 
     const theme = themes[name];
@@ -203,6 +198,14 @@ function ThemeLabel({ name, themes }: { name: string; themes: Record<string, { b
         <>
             <ThemeSwatch bg={theme?.bg ?? "var(--background)"} fg={theme?.accent ?? theme?.fg ?? "var(--foreground)"} /> {name}
         </>
+    );
+}
+
+function ThemeSwatch({ bg, fg }: { bg: string; fg: string; }) {
+    return (
+        <span className="w-5 h-3.5 border border-border rounded overflow-hidden inline-flex" style={{ backgroundColor: bg }}>
+            <span className="m-auto w-2 h-1.5" style={{ backgroundColor: fg }} />
+        </span>
     );
 }
 
