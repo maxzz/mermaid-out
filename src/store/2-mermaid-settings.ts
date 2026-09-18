@@ -54,6 +54,8 @@ export interface MermaidSettings {
     ascii: AsciiSettings;
     svg: SvgLayoutSettings;
     pngScale: PngScale;         // PNG export scale
+    exportFlattenColors: boolean;       // bake CSS vars / color-mix / oklch to hex
+    exportIncludeFontImport: boolean;   // keep Google Fonts @import in SVG markup
 }
 
 /** Mermaid's ELK defaults, except mergeEdges (beautiful-mermaid bundles fan-in/out). */
@@ -93,6 +95,8 @@ const DEFAULT_SETTINGS: MermaidSettings = {
         elk: { ...DEFAULT_ELK_LAYOUT },
     },
     pngScale: 2,
+    exportFlattenColors: true,
+    exportIncludeFontImport: false,
 };
 
 function loadSettings(): MermaidSettings {

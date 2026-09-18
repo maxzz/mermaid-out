@@ -49,8 +49,17 @@ export function PreviewToolbar() {
 async function copyCurrentOutput() {
     try {
         const bm = await loadBeautifulMermaid();
-        const { source, outputFormat, diagramTheme, ascii, svg } = mermaidSettings;
-        const result = renderDiagram(bm, source, { diagramTheme, ascii, svg }, outputFormat, true);
+        const { source, outputFormat, diagramTheme, ascii, svg, exportFlattenColors, exportIncludeFontImport } = mermaidSettings;
+        const result = renderDiagram(
+            bm,
+            source,
+            { diagramTheme, ascii, svg },
+            outputFormat,
+            {
+                flattenColors: exportFlattenColors,
+                includeFontImport: exportIncludeFontImport,
+            },
+        );
 
         if (result.error) {
             toast.error(`Cannot copy: ${result.error}`);

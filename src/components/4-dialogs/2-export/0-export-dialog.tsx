@@ -13,6 +13,7 @@ import { renderDiagram, type RenderResult } from "@/store/5-render-diagram/5-ren
 import { loadBeautifulMermaid } from "@/components/2-main/2-editor-page/1-panel-editor/8-lazy-modules";
 import { copyPngBlob, copyText, downloadBlob, downloadText, getSvgNaturalSize } from "@/components/4-dialogs/2-export/8-export-utils";
 import { ErrorBoundary } from "@/ui/local-ui/8-error-boundary";
+import { Switch } from "@/ui/shadcn/switch";
 import { isOpenExportDialogAtom } from "./a-types-export";
 import { ExportPreview, usePngPreview } from "./1-export-preview";
 
@@ -45,15 +46,23 @@ const DESCRIPTION_ID = "export-dialog-description";
 
 function Body() {
     const bm = use(loadBeautifulMermaid());
-    const { source, outputFormat, diagramTheme, ascii, svg, pngScale } = useSnapshot(mermaidSettings);
+    const { source, outputFormat, diagramTheme, ascii, svg, pngScale, exportFlattenColors, exportIncludeFontImport } = useSnapshot(mermaidSettings);
 
     // Start from the format currently shown in the preview pane
     const [format, setFormat] = useState<ExportFormat>(outputFormat);
 
-    // Export renders with resolved colors so the output is self-contained (no CSS variables)
     const renderResult = useMemo(
-        () => renderDiagram(bm, source, { diagramTheme, ascii, svg }, format === 'text' ? 'text' : 'svg', true),
-        [bm, source, diagramTheme, ascii, svg, format]);
+        () => renderDiagram(
+            bm,
+            source,
+            { diagramTheme, ascii, svg },
+            format === 'text' ? 'text' : 'svg',
+            {
+                flattenColors: exportFlattenColors,
+                includeFontImport: exportIncludeFontImport,
+            },
+        ),
+        [bm, source, diagramTheme, ascii, svg, format, exportFlattenColors, exportIncludeFontImport]);
 
     const png = usePngPreview(format === 'png' ? renderResult : null, pngScale);
     const [busy, setBusy] = useState(false);
@@ -92,6 +101,10 @@ function Body() {
             </div>
 
             <ExportPreview format={format} result={renderResult} pngUrl={png.url} pngSize={png.size} />
+
+            {format !== 'text' && (
+                <ExportSvgOptions format={format} flatten={exportFlattenColors} fontImport={exportIncludeFontImport} />
+            )}
 
             <div className="text-[.7rem] text-muted-foreground">
                 {describeOutput(format, renderResult, png.size)}
@@ -139,6 +152,39 @@ function TabPngScaleMultipliers({ value, onChange }: { value: PngScale; onChange
 }
 
 const PNG_SCALES: PngScale[] = [1, 2, 4];
+
+//---------------------------------------------------------------------------
+// SVG export toggles
+
+function ExportSvgOptions({ format, flatten, fontImport }: { format: ExportFormat; flatten: boolean; fontImport: boolean; }) {
+    return (
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <ExportSwitch
+                label="Flatten colors"
+                hint="Bake CSS variables, color-mix(), and oklch() to hex so the file looks the same in any viewer. Turn off to keep the live CSS as-is."
+                checked={flatten}
+                onChange={(v) => { mermaidSettings.exportFlattenColors = v; }}
+            />
+            {format === 'svg' && (
+                <ExportSwitch
+                    label="Font import"
+                    hint="Include a Google Fonts @import in the SVG. Turn off for offline files or fonts that are already installed (such as Geist)."
+                    checked={fontImport}
+                    onChange={(v) => { mermaidSettings.exportIncludeFontImport = v; }}
+                />
+            )}
+        </div>
+    );
+}
+
+function ExportSwitch({ label, hint, checked, onChange }: { label: string; hint: string; checked: boolean; onChange: (v: boolean) => void; }) {
+    return (
+        <label className="text-[.7rem] text-muted-foreground inline-flex gap-2 items-center cursor-pointer" title={hint}>
+            <Switch size="sm" checked={checked} onCheckedChange={onChange} />
+            {label}
+        </label>
+    );
+}
 
 //---------------------------------------------------------------------------
 // do export

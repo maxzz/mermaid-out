@@ -4,7 +4,7 @@ import { type AsciiRenderOptions, type DiagramColors, type RenderOptions } from 
 import { type BeautifulMermaidModule } from '@/components/2-main/2-editor-page/1-panel-editor/8-lazy-modules';
 import { type DiagramTheme, type MermaidSettings, type OutputFormat } from '../2-mermaid-settings';
 import { resolveCssVar } from '@/components/4-dialogs/2-export/8-export-utils';
-import { flattenSvgColors } from '@/components/4-dialogs/2-export/8-flatten-svg-colors';
+import { processExportedSvg, type SvgExportProcess } from '@/components/4-dialogs/2-export/8-flatten-svg-colors';
 import { fixMermaidAsciiBoxes } from '@/utils/local/fix-mermaid-ascii';
 import { detectGraphDirection, routeDiamondEdges } from '@/utils/local/route-diamond-edges';
 
@@ -16,6 +16,7 @@ export type RenderResult = {
 };
 
 export type RenderSettings = Pick<MermaidSettings, 'diagramTheme' | 'ascii' | 'svg'>;
+export type { SvgExportProcess };
 
 const EMPTY_SOURCE_RESULT = (format: OutputFormat): RenderResult => ({ format, output: '', error: null, ms: 0 });
 
@@ -24,7 +25,7 @@ const EMPTY_SOURCE_RESULT = (format: OutputFormat): RenderResult => ({ format, o
  * - 'auto' in the preview passes CSS variables so light/dark switches apply live without re-render.
  * - 'auto' for export resolves the current computed colors to sRGB hex.
  * - A named theme uses beautiful-mermaid's THEMES palette.
- * Export also inlines var() / color-mix() so standalone SVG viewers do not fall back to black.
+ * Export can also inline var() / color-mix() so standalone SVG viewers do not fall back to black.
  */
 function getDiagramColors(bm: BeautifulMermaidModule, theme: DiagramTheme, forExport: boolean): { colors: DiagramColors; transparent: boolean; } {
     if (theme === 'auto') {
@@ -98,7 +99,7 @@ export function buildAsciiOptions(settings: RenderSettings): AsciiRenderOptions 
 }
 
 /** Pure, synchronous render. Never throws; errors are returned in the result. */
-export function renderDiagram(bm: BeautifulMermaidModule, source: string, settings: RenderSettings, format: OutputFormat, forExport = false): RenderResult {
+export function renderDiagram(bm: BeautifulMermaidModule, source: string, settings: RenderSettings, format: OutputFormat, exportProcess?: SvgExportProcess): RenderResult {
     const text = source.trim();
     if (!text) {
         return EMPTY_SOURCE_RESULT(format);
@@ -106,10 +107,11 @@ export function renderDiagram(bm: BeautifulMermaidModule, source: string, settin
 
     const t0 = performance.now();
     try {
+        const forExport = !!exportProcess;
         const output = format === 'svg'
-            ? flattenExportedSvg(
+            ? applyExportProcess(
                 routeDiamondEdges(bm.renderMermaidSVG(text, buildSvgOptions(bm, settings, forExport)), detectGraphDirection(text)),
-                forExport,
+                exportProcess,
             )
             : fixMermaidAsciiBoxes(bm.renderMermaidASCII(text, buildAsciiOptions(settings)));
 
@@ -119,9 +121,8 @@ export function renderDiagram(bm: BeautifulMermaidModule, source: string, settin
     }
 }
 
-/** Bake CSS color functions to sRGB hex so the file matches the in-app preview. */
-function flattenExportedSvg(svg: string, forExport: boolean): string {
-    return forExport ? flattenSvgColors(svg) : svg;
+function applyExportProcess(svg: string, exportProcess?: SvgExportProcess): string {
+    return exportProcess ? processExportedSvg(svg, exportProcess) : svg;
 }
 
 /** Last preview render outcome (not persisted); published by the preview, shown by the status bar. */
