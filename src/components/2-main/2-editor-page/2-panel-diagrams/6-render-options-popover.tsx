@@ -112,13 +112,22 @@ function SvgLayoutSection() {
             </Row>
 
             <SliderRow
-                label="Padding"
+                label="X Padding"
                 hint="Empty space around the diagram inside the SVG canvas."
                 value={svg.padding}
                 min={0}
                 max={120}
                 step={4}
                 onChange={(v) => { mermaidSettings.svg.padding = v; }}
+            />
+            <SliderRow
+                label="Y Layer spacing"
+                hint="Vertical distance between successive layers of the diagram."
+                value={svg.layerSpacing}
+                min={4}
+                max={160}
+                step={4}
+                onChange={(v) => { mermaidSettings.svg.layerSpacing = v; }}
             />
             <SliderRow
                 label="Node spacing"
@@ -128,15 +137,6 @@ function SvgLayoutSection() {
                 max={120}
                 step={4}
                 onChange={(v) => { mermaidSettings.svg.nodeSpacing = v; }}
-            />
-            <SliderRow
-                label="Layer spacing"
-                hint="Vertical distance between successive layers of the diagram."
-                value={svg.layerSpacing}
-                min={4}
-                max={160}
-                step={4}
-                onChange={(v) => { mermaidSettings.svg.layerSpacing = v; }}
             />
         </Section>
     );

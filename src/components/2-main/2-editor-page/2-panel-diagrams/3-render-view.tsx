@@ -2,6 +2,7 @@ import { type CSSProperties, type PointerEvent, type RefObject, type WheelEvent,
 import { useAtomValue } from "jotai";
 import { useSnapshot } from "valtio";
 import { classNames } from "@/utils";
+
 import { mermaidSettings, setZoom, ZOOM_STEP } from "@/store/2-mermaid-settings";
 import { publishPreviewStatus, renderDiagram, useDebouncedValue } from "@/store/5-render-diagram/5-render";
 import { loadBeautifulMermaid } from "@/components/2-main/2-editor-page/1-panel-editor/8-lazy-modules";
@@ -23,25 +24,26 @@ export function RenderView({ scrollRef }: RenderViewProps) {
     const debouncedSource = useDebouncedValue(source, RENDER_DEBOUNCE_MS);
 
     // Synchronous, memoized render: no flash, only recomputed when inputs change
-    const result = useMemo(
+    const renderResult = useMemo(
         () => renderDiagram(bm, debouncedSource, { diagramTheme, ascii, svg }, outputFormat),
         [bm, debouncedSource, diagramTheme, ascii, svg, outputFormat],
     );
 
-    useEffect(() => publishPreviewStatus(result), [result]);
+    useEffect(() => publishPreviewStatus(renderResult), [renderResult]);
 
     const panMode = useAtomValue(panModeAtom);
     const panHandlers = usePanToScroll(scrollRef, panMode);
     const hostRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
-    const svgEnabled = result.format === "svg" && !!result.output && !result.error;
+    
+    const svgEnabled = renderResult.format === "svg" && !!renderResult.output && !renderResult.error;
 
     usePreviewSourceLink({
         contentRef,
         hostRef,
         scrollRef,
         enabled: svgEnabled,
-        output: svgEnabled ? result.output : "",
+        output: svgEnabled ? renderResult.output : "",
         panMode,
     });
 
@@ -56,41 +58,36 @@ export function RenderView({ scrollRef }: RenderViewProps) {
     const contentStyle: CSSProperties = { zoom };
 
     return (
-        <div
-            ref={hostRef}
-            className={classNames("min-w-full min-h-full", panMode && "cursor-grab select-none")}
-            onWheel={onWheel}
-            {...panHandlers}
-        >
+        <div ref={hostRef} className={classNames("min-w-full min-h-full", panMode && "cursor-grab select-none")} onWheel={onWheel} {...panHandlers}>
             <div className="p-6 min-w-full min-h-full flex">
-                {result.error
+                {renderResult.error
                     ? (
                         <pre className="m-auto px-4 py-3 max-w-full text-xs font-code text-destructive bg-destructive/10 border border-destructive/30 rounded-md whitespace-pre-wrap">
-                            {result.error}
+                            {renderResult.error}
                         </pre>
                     )
-                    : !result.output
+                    : !renderResult.output
                         ? (
                             <div className="m-auto text-sm text-muted-foreground">
                                 Start typing to render your diagram
                             </div>
                         )
-                        : result.format === 'svg'
+                        : renderResult.format === 'svg'
                             ? (
                                 <div
                                     ref={contentRef}
-                                    {...{ [PREVIEW_CONTENT_ATTR]: '' }}
                                     className="m-auto [&>svg]:max-w-none [&>svg]:block"
+                                    {...{ [PREVIEW_CONTENT_ATTR]: '' }}
                                     style={contentStyle}
-                                    dangerouslySetInnerHTML={{ __html: result.output }}
+                                    dangerouslySetInnerHTML={{ __html: renderResult.output }}
                                 />
                             )
                             : (
                                 <DiagramText
-                                    {...{ [PREVIEW_CONTENT_ATTR]: '' }}
                                     className="m-auto"
+                                    {...{ [PREVIEW_CONTENT_ATTR]: '' }}
                                     style={contentStyle}
-                                    text={result.output}
+                                    text={renderResult.output}
                                 />
                             )
                 }

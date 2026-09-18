@@ -7,17 +7,7 @@ import { Button } from "@/ui/shadcn/button";
 
 import { mermaidSettings, setZoom, zoomIn, zoomOut, ZOOM_MAX, ZOOM_MIN } from "@/store/2-mermaid-settings";
 
-/** Pan mode: drag the preview to scroll. Transient UI state. */
-export const panModeAtom = atom(false);
-
-/** Marker attribute on the zoomed preview content, used by fit-to-view. */
-export const PREVIEW_CONTENT_ATTR = 'data-preview-content';
-
-type ZoomControlsProps = ComponentProps<'div'> & {
-    scrollRef: RefObject<HTMLDivElement | null>;
-};
-
-export function ZoomControls({ scrollRef, className, ...rest }: ZoomControlsProps) {
+export function ZoomControls({ scrollRef, className, ...rest }: ComponentProps<'div'> & { scrollRef: RefObject<HTMLDivElement | null> }) {
     const { zoom } = useSnapshot(mermaidSettings);
     const [panMode, setPanMode] = useAtom(panModeAtom);
 
@@ -67,15 +57,21 @@ export function ZoomControls({ scrollRef, className, ...rest }: ZoomControlsProp
             </Button>
 
             <Button
+                className={classNames(panMode && "bg-muted text-foreground")}
                 variant="ghost"
                 size="icon-xs"
-                className={classNames(panMode && "bg-muted text-foreground")}
                 onClick={() => setPanMode((v) => !v)}
-                aria-pressed={panMode}
                 title={panMode ? "Pan mode on: drag to scroll" : "Pan mode: drag to scroll"}
+                aria-pressed={panMode}
             >
                 <HandIcon />
             </Button>
         </div>
     );
 }
+
+/** Pan mode: drag the preview to scroll. Transient UI state. */
+export const panModeAtom = atom(false);
+
+/** Marker attribute on the zoomed preview content, used by fit-to-view. */
+export const PREVIEW_CONTENT_ATTR = 'data-preview-content';
