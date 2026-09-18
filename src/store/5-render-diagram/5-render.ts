@@ -28,23 +28,47 @@ function getDiagramColors(bm: BeautifulMermaidModule, theme: DiagramTheme, forEx
     if (theme === 'auto') {
         if (forExport) {
             return {
-                colors: {
+                colors: isolateFromAppTheme({
                     bg: resolveCssVar('--background', bm.DEFAULTS.bg),
                     fg: resolveCssVar('--foreground', bm.DEFAULTS.fg),
-                },
+                }),
                 transparent: false,
             };
         }
         return {
-            colors: { bg: 'var(--background)', fg: 'var(--foreground)' },
+            colors: isolateFromAppTheme({ bg: 'var(--background)', fg: 'var(--foreground)' }),
             transparent: true,
         };
     }
 
     const named = bm.THEMES[theme];
     return {
-        colors: named ?? { bg: bm.DEFAULTS.bg, fg: bm.DEFAULTS.fg },
+        colors: isolateFromAppTheme(named ?? { bg: bm.DEFAULTS.bg, fg: bm.DEFAULTS.fg }),
         transparent: false,
+    };
+}
+
+/**
+ * beautiful-mermaid reads optional `--accent` / `--muted` / `--border` on the SVG
+ * (arrowheads, edge labels, node strokes). Those names collide with shadcn tokens
+ * on `:root`, so an unset zinc-light palette inherits the app theme: light
+ * `--accent`/`--muted` are nearly white, which makes labels and arrows vanish.
+ *
+ * `initial` is the guaranteed-invalid custom-property value, so
+ * `var(--accent, color-mix(...))` in the SVG uses the library fallback instead
+ * of the inherited app token. Named themes that set these colors keep them.
+ */
+const UNSET_DIAGRAM_VAR = 'initial';
+
+export function isolateFromAppTheme(colors: DiagramColors): DiagramColors {
+    return {
+        bg: colors.bg,
+        fg: colors.fg,
+        line: colors.line ?? UNSET_DIAGRAM_VAR,
+        accent: colors.accent ?? UNSET_DIAGRAM_VAR,
+        muted: colors.muted ?? UNSET_DIAGRAM_VAR,
+        surface: colors.surface ?? UNSET_DIAGRAM_VAR,
+        border: colors.border ?? UNSET_DIAGRAM_VAR,
     };
 }
 
