@@ -3,17 +3,18 @@ import { useAtom } from "jotai";
 import { useSnapshot } from "valtio";
 import { toast } from "sonner";
 import { CopyIcon, DownloadIcon } from "lucide-react";
-import { type ExportFormat, mermaidSettings, type PngScale } from "@/store/2-mermaid-settings";
-import { renderDiagram, type RenderResult } from "@/store/5-render";
-import { loadBeautifulMermaid } from "@/components/2-main/2-editor-page/2-editor/8-lazy-modules";
-import { copyPngBlob, copyText, downloadBlob, downloadText } from "@/components/4-dialogs/2-export/8-export-utils";
 import { Button } from "@/ui/shadcn/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/ui/shadcn/dialog";
 import { Tabs, TabsList, TabsTrigger } from "@/ui/shadcn/tabs";
 import { BarsLoaderIcon } from "@/ui/local-ui";
+
+import { type ExportFormat, mermaidSettings, type PngScale } from "@/store/2-mermaid-settings";
+import { renderDiagram, type RenderResult } from "@/store/5-render-diagram/5-render";
+import { loadBeautifulMermaid } from "@/components/2-main/2-editor-page/1-panel-editor/8-lazy-modules";
+import { copyPngBlob, copyText, downloadBlob, downloadText, getSvgNaturalSize } from "@/components/4-dialogs/2-export/8-export-utils";
 import { ErrorBoundary } from "@/ui/local-ui/8-error-boundary";
 import { isOpenExportDialogAtom } from "./a-types-export";
-import { describeOutput, ExportPreview, usePngPreview } from "./1-preview";
+import { ExportPreview, usePngPreview } from "./1-export-preview";
 
 export function ExportDialog() {
     const [isOpen, setIsOpen] = useAtom(isOpenExportDialogAtom);
@@ -140,7 +141,7 @@ function TabPngScaleMultipliers({ value, onChange }: { value: PngScale; onChange
 const PNG_SCALES: PngScale[] = [1, 2, 4];
 
 //---------------------------------------------------------------------------
-// Export
+// do export
 
 async function doExport(action: 'copy' | 'download', format: ExportFormat, result: RenderResult, pngBlob: Blob | null, pngScale: PngScale) {
     const def = EXPORT_FORMATS.find((f) => f.value === format)!;
@@ -176,3 +177,25 @@ const EXPORT_FORMATS: { value: ExportFormat; label: string; ext: string; mime: s
 ];
 
 const EXPORT_FILENAME = 'diagram';
+
+//---------------------------------------------------------------------------
+// Describe output information
+
+function describeOutput(format: ExportFormat, result: RenderResult, pngSize: { w: number; h: number; } | null): string {
+    if (result.error || !result.output) {
+        return '';
+    }
+    if (format === 'png') {
+        return pngSize ? `PNG ${pngSize.w} x ${pngSize.h} px` : 'Rendering PNG...';
+    }
+    if (format === 'text') {
+        const lines = result.output.split('\n').length;
+        return `${lines} lines, ${formatBytes(result.output.length)}`;
+    }
+    const { w, h } = getSvgNaturalSize(result.output);
+    return `SVG ${Math.round(w)} x ${Math.round(h)} px, ${formatBytes(result.output.length)}`;
+}
+
+function formatBytes(n: number): string {
+    return n < 1024 ? `${n} B` : `${(n / 1024).toFixed(1)} KB`;
+}

@@ -11,7 +11,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/ui/s
 
 import { DIAGRAM_FONTS, type DiagramTheme, mermaidSettings } from "@/store/2-mermaid-settings";
 import { BarsLoaderIcon, PreviewSelectItem, useSelectPreview } from "@/ui/local-ui";
-import { loadBeautifulMermaid } from "@/components/2-main/2-editor-page/2-editor/8-lazy-modules";
+import { loadBeautifulMermaid } from "@/components/2-main/2-editor-page/1-panel-editor/8-lazy-modules";
 
 export function RenderOptionsPopover() {
     return (

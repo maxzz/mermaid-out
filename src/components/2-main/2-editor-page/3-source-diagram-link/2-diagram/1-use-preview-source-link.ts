@@ -14,7 +14,7 @@ import {
     sourceLink,
     buildSourceIndex,
     type LinkIntensity,
-} from "@/store/6-source-link";
+} from "@/store/6-source-render-links";
 import "./8-highlight.css";
 
 const CARET_CLASS = "is-source-link-caret";
@@ -128,11 +128,7 @@ function firstHighlighted(root: Element, keys: string[]): Element | null {
     return null;
 }
 
-function attachPanSafeClick(
-    host: HTMLElement,
-    scrollEl: HTMLElement | null,
-    onSelect: (target: EventTarget | null) => void,
-): () => void {
+function attachPanSafeClick(host: HTMLElement, scrollEl: HTMLElement | null, onSelect: (target: EventTarget | null) => void): () => void {
     let down: { x: number; y: number; pointerId: number; } | null = null;
     const upTarget = scrollEl ?? host;
 

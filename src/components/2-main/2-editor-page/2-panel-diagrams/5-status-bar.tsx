@@ -1,6 +1,6 @@
 import { useSnapshot } from "valtio";
 import { classNames } from "@/utils";
-import { previewStatus } from "@/store/5-render";
+import { previewStatus } from "@/store/5-render-diagram/5-render";
 
 export function StatusBar() {
     const { error, ms, empty } = useSnapshot(previewStatus);

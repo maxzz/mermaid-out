@@ -20,7 +20,7 @@ export function loadBeautifulMermaid(): Promise<BeautifulMermaidModule> {
 // Monaco Editor
 
 export function loadMonacoEditor() {
-    return import('@/components/2-main/2-editor-page/2-editor/2-monaco-editor');
+    return import('@/components/2-main/2-editor-page/1-panel-editor/2-monaco-editor');
 }
 
 /** Warm up heavy chunks while the user is still on the welcome page. */

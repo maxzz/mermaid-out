@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { proxy } from 'valtio';
 import { type AsciiRenderOptions, type DiagramColors, type RenderOptions } from 'beautiful-mermaid'; // `import type` only: keep the lazy chunk lazy
-import { type BeautifulMermaidModule } from '@/components/2-main/2-editor-page/2-editor/8-lazy-modules';
-import { type DiagramTheme, type MermaidSettings, type OutputFormat } from './2-mermaid-settings';
+import { type BeautifulMermaidModule } from '@/components/2-main/2-editor-page/1-panel-editor/8-lazy-modules';
+import { type DiagramTheme, type MermaidSettings, type OutputFormat } from '../2-mermaid-settings';
 import { resolveCssVar } from '@/components/4-dialogs/2-export/8-export-utils';
 import { fixMermaidAsciiBoxes } from '@/utils/local/fix-mermaid-ascii';
 import { detectGraphDirection, routeDiamondEdges } from '@/utils/local/route-diamond-edges';
