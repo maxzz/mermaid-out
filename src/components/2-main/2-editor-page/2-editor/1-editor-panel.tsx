@@ -1,8 +1,8 @@
 import { lazy, Suspense } from "react";
 import { mermaidSettings } from "@/store/2-mermaid-settings";
 import { loadMonacoEditor } from "@/components/2-main/2-editor-page/2-editor/8-lazy-modules";
-import { MERMAID_SAMPLES } from "@/utils/mermaid-samples";
-import { BarsLoader } from "@/ui/local-ui";
+import { MERMAID_SAMPLES } from "@/utils/local/mermaid-samples";
+import { BarsLoaderIcon } from "@/ui/local-ui";
 import { ErrorBoundary } from "@/ui/local-ui/8-error-boundary";
 import { ScrollArea } from "@/ui/shadcn/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/shadcn/select";
@@ -20,7 +20,7 @@ export function EditorPanel() {
                 <div className="absolute inset-0 overflow-hidden">
                     <ScrollArea className="h-full" fullHeight fixedWidth viewportClassName="overflow-hidden!">
                         <ErrorBoundary fallback={<PanelMessage>Failed to load the editor.</PanelMessage>}>
-                            <Suspense fallback={<PanelMessage><BarsLoader /></PanelMessage>}>
+                            <Suspense fallback={<PanelMessage><BarsLoaderIcon /></PanelMessage>}>
                                 <MonacoMermaidEditor />
                             </Suspense>
                         </ErrorBoundary>

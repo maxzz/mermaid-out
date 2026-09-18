@@ -5,7 +5,7 @@ import { CopyIcon, DownloadIcon } from "lucide-react";
 import { mermaidSettings, type OutputFormat } from "@/store/2-mermaid-settings";
 import { renderDiagram } from "@/store/5-render";
 import { loadBeautifulMermaid } from "@/components/2-main/2-editor-page/2-editor/8-lazy-modules";
-import { copyText } from "@/utils/export-utils";
+import { copyText } from "@/components/4-dialogs/2-export/8-export-utils";
 import { isOpenExportDialogAtom } from "@/components/4-dialogs/2-export/a-types-export";
 import { Button } from "@/ui/shadcn/button";
 import { Tabs, TabsList, TabsTrigger } from "@/ui/shadcn/tabs";
@@ -30,16 +30,15 @@ export function PreviewToolbar() {
                 </Tabs>
             </div>
 
-            <div className="flex items-center gap-1">
+            <div className="flex items-center">
                 <Button variant="ghost" size="xs" onClick={() => copyCurrentOutput()} title={`Copy ${outputFormat === 'svg' ? 'SVG markup' : 'text'} to clipboard`}>
                     <CopyIcon />
                 </Button>
 
                 <RenderOptionsPopover />
 
-                <Button variant="outline" size="xs" onClick={() => setOpenExport(true)} title="Export as SVG, text or PNG">
+                <Button variant="ghost" size="xs" onClick={() => setOpenExport(true)} title="Export as SVG, text or PNG">
                     <DownloadIcon />
-                    Export...
                 </Button>
             </div>
         </div>

@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { proxy } from 'valtio';
-import type { AsciiRenderOptions, DiagramColors, RenderOptions } from 'beautiful-mermaid'; // `import type` only: keep the lazy chunk lazy
-import type { BeautifulMermaidModule } from '@/components/2-main/2-editor-page/2-editor/8-lazy-modules';
-import { resolveCssVar } from '@/utils/export-utils';
-import { fixMermaidAsciiBoxes } from '@/utils/fix-mermaid-ascii';
-import { detectGraphDirection, routeDiamondEdges } from '@/utils/route-diamond-edges';
+import { type AsciiRenderOptions, type DiagramColors, type RenderOptions } from 'beautiful-mermaid'; // `import type` only: keep the lazy chunk lazy
+import { type BeautifulMermaidModule } from '@/components/2-main/2-editor-page/2-editor/8-lazy-modules';
 import { type DiagramTheme, type MermaidSettings, type OutputFormat } from './2-mermaid-settings';
+import { resolveCssVar } from '@/components/4-dialogs/2-export/8-export-utils';
+import { fixMermaidAsciiBoxes } from '@/utils/local/fix-mermaid-ascii';
+import { detectGraphDirection, routeDiamondEdges } from '@/utils/local/route-diamond-edges';
 
 export type RenderResult = {
     format: OutputFormat;
@@ -24,7 +24,7 @@ const EMPTY_SOURCE_RESULT = (format: OutputFormat): RenderResult => ({ format, o
  * - 'auto' for export resolves the current computed colors so the file is self-contained.
  * - A named theme uses beautiful-mermaid's THEMES palette.
  */
-export function getDiagramColors(bm: BeautifulMermaidModule, theme: DiagramTheme, forExport: boolean): { colors: DiagramColors; transparent: boolean; } {
+function getDiagramColors(bm: BeautifulMermaidModule, theme: DiagramTheme, forExport: boolean): { colors: DiagramColors; transparent: boolean; } {
     if (theme === 'auto') {
         if (forExport) {
             return {

@@ -1,7 +1,7 @@
 import { proxy, subscribe } from 'valtio';
 import type { ThemeName } from 'beautiful-mermaid'; // `import type` only: must not pull the lazy chunk into the main bundle
 import { debounceDevTools } from '@/utils/debounce';
-import { DEFAULT_MERMAID_SOURCE } from '@/utils/mermaid-samples';
+import { DEFAULT_MERMAID_SOURCE } from '@/utils/local/mermaid-samples';
 
 const STORE_KEY = "tm-mermaid-out-settings";
 const STORE_VER = "v1.0";

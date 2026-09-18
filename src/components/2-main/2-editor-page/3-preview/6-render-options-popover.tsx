@@ -10,7 +10,7 @@ import { Switch } from "@/ui/shadcn/switch";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/ui/shadcn/tooltip";
 
 import { DIAGRAM_FONTS, type DiagramTheme, mermaidSettings } from "@/store/2-mermaid-settings";
-import { BarsLoader, PreviewSelectItem, useSelectPreview } from "@/ui/local-ui";
+import { BarsLoaderIcon, PreviewSelectItem, useSelectPreview } from "@/ui/local-ui";
 import { loadBeautifulMermaid } from "@/components/2-main/2-editor-page/2-editor/8-lazy-modules";
 
 export function RenderOptionsPopover() {
@@ -40,7 +40,7 @@ export function RenderOptionsPopover() {
                 <TooltipProvider delayDuration={500}>
                     <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] gap-x-2 gap-y-2 items-center">
 
-                        <Suspense fallback={<div className="col-span-full py-6 flex justify-center"><BarsLoader /></div>}>
+                        <Suspense fallback={<div className="col-span-full py-6 flex justify-center"><BarsLoaderIcon /></div>}>
                             <DiagramThemeSection />
                         </Suspense>
                         <SvgLayoutSection />

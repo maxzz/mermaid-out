@@ -2,7 +2,7 @@ import { Suspense, useLayoutEffect, useRef, useState, type RefObject } from "rea
 import { useSnapshot } from "valtio";
 import { classNames } from "@/utils";
 import { mermaidSettings } from "@/store/2-mermaid-settings";
-import { BarsLoader } from "@/ui/local-ui";
+import { BarsLoaderIcon } from "@/ui/local-ui";
 import { ErrorBoundary } from "@/ui/local-ui/8-error-boundary";
 import { ScrollArea2 } from "@/ui/shadcn/scroll-area";
 import { PreviewToolbar } from "./2-preview-toolbar";
@@ -32,7 +32,7 @@ export function PreviewPanel() {
                         type="always"
                     >
                         <ErrorBoundary fallback={<PanelMessage>Failed to load the diagram renderer.</PanelMessage>}>
-                            <Suspense fallback={<PanelMessage><BarsLoader /></PanelMessage>}>
+                            <Suspense fallback={<PanelMessage><BarsLoaderIcon /></PanelMessage>}>
                                 <RenderView scrollRef={scrollRef} />
                             </Suspense>
                         </ErrorBoundary>

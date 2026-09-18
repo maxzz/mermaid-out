@@ -3,7 +3,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { defineConfig, type PluginOption } from 'vite';
 import react from '@vitejs/plugin-react';
 import visualizer from 'rollup-plugin-visualizer';
-import { isBeautifulMermaidBundle, patchBeautifulMermaidElkSource } from './src/utils/patch-beautiful-mermaid-elk.ts';
+import { isBeautifulMermaidBundle, patchBeautifulMermaidElkSource } from './src/utils/local/patch-beautiful-mermaid-elk.ts';
 
 // https://vite.dev/config/
 export default defineConfig({

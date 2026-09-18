@@ -8,5 +8,5 @@ export * from "./8-shared-styles";
 
 export * from "./srcoll-area-pos";
 
-export * from "./4-bars-loader";
+export * from "./4-bars-loader-icon";
 

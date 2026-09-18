@@ -8,28 +8,6 @@
 export type FlowDirection = 'TD' | 'BT' | 'LR' | 'RL';
 export type Compass = 'n' | 'e' | 's' | 'w';
 
-export type Point = { x: number; y: number; };
-
-export type NodeBox = {
-    id: string;
-    shape: string;
-    x: number;
-    y: number;
-    w: number;
-    h: number;
-};
-
-export type EdgeRef = {
-    from: string;
-    to: string;
-    label?: string;
-    points: Point[];
-};
-
-const GAP = 20;
-const YES_RE = /^(yes|true|y|ok)$/i;
-const NO_RE = /^(no|false|n)$/i;
-
 export function detectGraphDirection(source: string): FlowDirection {
     const lines = source.split(/\r?\n/).map((l) => l.trim()).filter((l) => l && !l.startsWith('%%'));
     let i = 0;
@@ -47,6 +25,19 @@ export function detectGraphDirection(source: string): FlowDirection {
     const dir = m[1].toUpperCase();
     return dir === 'TB' ? 'TD' : dir as FlowDirection;
 }
+
+//---------------------------------------------------------------------------
+
+export type Point = { x: number; y: number; };
+
+export type NodeBox = {
+    id: string;
+    shape: string;
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+};
 
 export function boxCenter(box: NodeBox): Point {
     return { x: box.x + box.w / 2, y: box.y + box.h / 2 };
@@ -80,6 +71,15 @@ export function outgoingPorts(direction: FlowDirection): [Compass, Compass] {
         default: return ['w', 'e'];
     }
 }
+
+//---------------------------------------------------------------------------
+
+export type EdgeRef = {
+    from: string;
+    to: string;
+    label?: string;
+    points: Point[];
+};
 
 export function classifyOutgoingSides(diamond: NodeBox, edges: EdgeRef[], nodes: Map<string, NodeBox>, direction: FlowDirection): Compass[] {
     const [leftPort, rightPort] = outgoingPorts(direction);
@@ -469,3 +469,7 @@ function formatPoints(points: Point[]): string {
 function fmt(n: number): string {
     return String(Math.round(n * 10) / 10);
 }
+
+const GAP = 20;
+const YES_RE = /^(yes|true|y|ok)$/i;
+const NO_RE = /^(no|false|n)$/i;
