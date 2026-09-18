@@ -88,4 +88,11 @@ describe("buildSvgOptions", () => {
         expect(options.accent).toBe(UNSET);
         expect(options.transparent).toBe(true);
     });
+
+    it("uses default hex colors for auto export when CSS vars are unavailable", () => {
+        const options = buildSvgOptions(bm, { diagramTheme: "auto", ascii, svg }, true);
+        expect(options.bg).toBe("#FFFFFF");
+        expect(options.fg).toBe("#27272A");
+        expect(options.transparent).toBe(false);
+    });
 });

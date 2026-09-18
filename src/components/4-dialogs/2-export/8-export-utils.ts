@@ -2,6 +2,8 @@
  * Helpers for exporting rendered diagrams: SVG/text/PNG download and clipboard.
  */
 
+import { cssColorToSrgb } from './8-flatten-svg-colors';
+
 export function downloadBlob(blob: Blob, filename: string) {
     const url = URL.createObjectURL(blob);
     try {
@@ -84,11 +86,16 @@ export async function svgToPngBlob(svgText: string, scale: number): Promise<PngR
     }
 }
 
-/** Resolve a CSS custom property on :root to its computed value (e.g. an oklch() color). */
+/** Resolve a CSS custom property on :root to sRGB hex (oklch() is not portable in SVG files). */
 export function resolveCssVar(name: string, fallback: string): string {
     if (typeof window === 'undefined') {
         return fallback;
     }
     const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-    return value || fallback;
+    const raw = value || fallback;
+    try {
+        return cssColorToSrgb(raw) || fallback;
+    } catch {
+        return raw;
+    }
 }
